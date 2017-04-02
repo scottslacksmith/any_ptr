@@ -13,6 +13,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "..\src\test\test.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "benchmark", "..\src\benchmark\benchmark.vcxproj", "{83B81187-5917-4AD6-A019-530CFA23707E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{70F564CB-8B17-4A39-938B-83945024DD32}"
+	ProjectSection(SolutionItems) = preProject
+		..\include\any_ptr.h = ..\include\any_ptr.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

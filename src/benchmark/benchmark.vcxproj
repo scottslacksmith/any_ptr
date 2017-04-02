@@ -106,10 +106,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="benchmark.hpp" />
     <ClInclude Include="precompiled.hpp" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="benchmark_any_ptr.cpp" />
+    <ClCompile Include="benchmark_any.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -117,6 +120,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\thirdparty\google\benchmark\1.1.0\msvc\google_benchmark.vcxproj">
+      <Project>{f548dbf0-7452-476f-bab8-eca84ff9d12d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

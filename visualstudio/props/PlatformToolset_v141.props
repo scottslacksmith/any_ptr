@@ -5,8 +5,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <PreprocessorDefinitions>_STL_EXTRA_DISABLED_WARNINGS=4365 4582 4583 4623 4625 4626 4774 4987 5026 5027;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>

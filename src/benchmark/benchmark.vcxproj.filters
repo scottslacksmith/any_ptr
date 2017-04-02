@@ -17,12 +17,21 @@
     <ClInclude Include="precompiled.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="benchmark.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="precompiled.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="benchmark_any_ptr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="benchmark_any.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

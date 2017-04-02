@@ -13,5 +13,13 @@
 #include <tchar.h>
 
 
-
 // TODO: reference additional headers your program requires here
+#ifdef _MSC_VER
+#pragma warning(push, 2)
+#endif
+
+#include <benchmark/benchmark.h>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

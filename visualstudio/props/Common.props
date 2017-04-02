@@ -26,7 +26,7 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4514;4571;4710;4711;4820;4987</DisableSpecificWarnings>
       <MinimalRebuild>false</MinimalRebuild>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\src;C:\Boost\include\boost-1_62;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.hpp</PrecompiledHeaderFile>
       <ForcedIncludeFiles>precompiled.hpp</ForcedIncludeFiles>
     </ClCompile>

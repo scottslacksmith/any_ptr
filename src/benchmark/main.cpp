@@ -1,7 +1,4 @@
+#include "benchmark.hpp"
 
-
-int main()
-{
-    return 0;
-}
+BENCHMARK_MAIN()
 
