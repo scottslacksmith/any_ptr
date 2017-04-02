@@ -74,7 +74,7 @@ namespace xxx {
       bool has_value() const noexcept { return my_throw_func != nullptr; }
 
       // Return type-info for held T
-      const std::type_info& type() const noexcept { return (my_type_info ? *my_type_info : typeid(void)); }
+      const std::type_info& type() const noexcept { return *my_type_info; }
 
     private:
 
@@ -85,7 +85,7 @@ namespace xxx {
 
       void*                   my_ptr{ nullptr };
       Throw_func *            my_throw_func{ nullptr };
-      const std::type_info *  my_type_info{ nullptr };
+      const std::type_info *  my_type_info{ & typeid(void) };
 
       template <typename T>
       std::pair<T*,bool> dynamic_up_cast() const noexcept;
@@ -133,7 +133,7 @@ namespace xxx {
       }
       else if (has_value()) { // try an implicit up cast by throwing an exception
         try {
-          my_throw_func(my_ptr);
+          my_throw_func(const_cast<void*>(my_ptr));
         }
         catch (T* ptr) { // implicit up cast succeeded
           result.first = ptr;
