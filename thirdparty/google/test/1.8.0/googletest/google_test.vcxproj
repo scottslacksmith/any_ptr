@@ -18,12 +18,52 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gtest-all.cc" />
+    <ClInclude Include="src\gtest-death-test.cc" />
+    <ClInclude Include="src\gtest-filepath.cc" />
+    <ClInclude Include="src\gtest-port.cc" />
+    <ClInclude Include="src\gtest-printers.cc" />
+    <ClInclude Include="src\gtest-test-part.cc" />
+    <ClInclude Include="src\gtest-typed-test.cc" />
+    <ClInclude Include="src\gtest.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\gtest\gtest-death-test.h" />
+    <ClInclude Include="include\gtest\gtest-message.h" />
+    <ClInclude Include="include\gtest\gtest-param-test.h" />
+    <ClInclude Include="include\gtest\gtest-printers.h" />
+    <ClInclude Include="include\gtest\gtest-spi.h" />
+    <ClInclude Include="include\gtest\gtest-test-part.h" />
+    <ClInclude Include="include\gtest\gtest-typed-test.h" />
+    <ClInclude Include="include\gtest\gtest.h" />
+    <ClInclude Include="include\gtest\gtest_pred_impl.h" />
+    <ClInclude Include="include\gtest\gtest_prod.h" />
+    <ClInclude Include="include\gtest\internal\custom\gtest-port.h" />
+    <ClInclude Include="include\gtest\internal\custom\gtest-printers.h" />
+    <ClInclude Include="include\gtest\internal\custom\gtest.h" />
+    <ClInclude Include="include\gtest\internal\gtest-death-test-internal.h" />
+    <ClInclude Include="include\gtest\internal\gtest-filepath.h" />
+    <ClInclude Include="include\gtest\internal\gtest-internal.h" />
+    <ClInclude Include="include\gtest\internal\gtest-linked_ptr.h" />
+    <ClInclude Include="include\gtest\internal\gtest-param-util-generated.h" />
+    <ClInclude Include="include\gtest\internal\gtest-param-util.h" />
+    <ClInclude Include="include\gtest\internal\gtest-port-arch.h" />
+    <ClInclude Include="include\gtest\internal\gtest-port.h" />
+    <ClInclude Include="include\gtest\internal\gtest-string.h" />
+    <ClInclude Include="include\gtest\internal\gtest-tuple.h" />
+    <ClInclude Include="include\gtest\internal\gtest-type-util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\gtest\gtest-param-test.h.pump" />
+    <None Include="include\gtest\internal\gtest-tuple.h.pump" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F548DBF0-7452-476F-BAB8-ECA84FF9D12D}</ProjectGuid>
+    <ProjectGuid>{55DF8739-4615-45C6-A976-9627CBC2745D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>googlebenchmark</RootNamespace>
+    <RootNamespace>google_test</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>google_benchmark</ProjectName>
+    <ProjectName>google_test</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(SolutionDir)props\PlatformToolset.props" />
@@ -35,6 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -54,27 +95,28 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="google_benchmark_build.props" />
+    <Import Project="$(ProjectDir)google_test_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="google_benchmark_build.props" />
+    <Import Project="$(ProjectDir)google_test_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="google_benchmark_build.props" />
+    <Import Project="$(ProjectDir)google_test_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="google_benchmark_build.props" />
+    <Import Project="$(ProjectDir)google_test_build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -89,41 +131,6 @@
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark.h" />
-    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark_api.h" />
-    <ClInclude Include="$(ProjectDir)..\include\benchmark\macros.h" />
-    <ClInclude Include="$(ProjectDir)..\include\benchmark\reporter.h" />
-    <ClInclude Include="$(ProjectDir)..\src\arraysize.h" />
-    <ClInclude Include="$(ProjectDir)..\src\benchmark_api_internal.h" />
-    <ClInclude Include="$(ProjectDir)..\src\check.h" />
-    <ClInclude Include="$(ProjectDir)..\src\colorprint.h" />
-    <ClInclude Include="$(ProjectDir)..\src\commandlineflags.h" />
-    <ClInclude Include="$(ProjectDir)..\src\complexity.h" />
-    <ClInclude Include="$(ProjectDir)..\src\cycleclock.h" />
-    <ClInclude Include="$(ProjectDir)..\src\internal_macros.h" />
-    <ClInclude Include="$(ProjectDir)..\src\log.h" />
-    <ClInclude Include="$(ProjectDir)..\src\mutex.h" />
-    <ClInclude Include="$(ProjectDir)..\src\re.h" />
-    <ClInclude Include="$(ProjectDir)..\src\sleep.h" />
-    <ClInclude Include="$(ProjectDir)..\src\stat.h" />
-    <ClInclude Include="$(ProjectDir)..\src\string_util.h" />
-    <ClInclude Include="$(ProjectDir)..\src\sysinfo.h" />
-    <ClInclude Include="$(ProjectDir)..\src\timers.h" />
-    <ClCompile Include="$(ProjectDir)..\src\benchmark.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\benchmark_register.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\colorprint.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\commandlineflags.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\complexity.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\console_reporter.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\csv_reporter.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\json_reporter.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\reporter.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\sleep.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\string_util.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\sysinfo.cc" />
-    <ClCompile Include="$(ProjectDir)..\src\timers.cc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
