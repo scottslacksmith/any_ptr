@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:c++latest  -Qunused-arguments -fcolor-diagnostics -Wno-missing-braces %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_HAS_CXX17;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

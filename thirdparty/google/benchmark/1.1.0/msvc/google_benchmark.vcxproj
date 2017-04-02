@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F548DBF0-7452-476F-BAB8-ECA84FF9D12D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>googlebenchmark</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>google_benchmark</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)props\PlatformToolset.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="google_benchmark.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="google_benchmark.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="google_benchmark.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="google_benchmark.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile />
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile />
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark.h" />
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark_api.h" />
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\macros.h" />
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\reporter.h" />
+    <ClInclude Include="$(ProjectDir)..\src\arraysize.h" />
+    <ClInclude Include="$(ProjectDir)..\src\benchmark_api_internal.h" />
+    <ClInclude Include="$(ProjectDir)..\src\check.h" />
+    <ClInclude Include="$(ProjectDir)..\src\colorprint.h" />
+    <ClInclude Include="$(ProjectDir)..\src\commandlineflags.h" />
+    <ClInclude Include="$(ProjectDir)..\src\complexity.h" />
+    <ClInclude Include="$(ProjectDir)..\src\cycleclock.h" />
+    <ClInclude Include="$(ProjectDir)..\src\internal_macros.h" />
+    <ClInclude Include="$(ProjectDir)..\src\log.h" />
+    <ClInclude Include="$(ProjectDir)..\src\mutex.h" />
+    <ClInclude Include="$(ProjectDir)..\src\re.h" />
+    <ClInclude Include="$(ProjectDir)..\src\sleep.h" />
+    <ClInclude Include="$(ProjectDir)..\src\stat.h" />
+    <ClInclude Include="$(ProjectDir)..\src\string_util.h" />
+    <ClInclude Include="$(ProjectDir)..\src\sysinfo.h" />
+    <ClInclude Include="$(ProjectDir)..\src\timers.h" />
+    <ClCompile Include="$(ProjectDir)..\src\benchmark.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\benchmark_register.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\colorprint.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\commandlineflags.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\complexity.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\console_reporter.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\csv_reporter.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\json_reporter.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\reporter.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\sleep.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\string_util.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\sysinfo.cc" />
+    <ClCompile Include="$(ProjectDir)..\src\timers.cc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

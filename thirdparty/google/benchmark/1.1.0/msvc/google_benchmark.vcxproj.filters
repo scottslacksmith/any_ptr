@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(ProjectDir)..\src\benchmark.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\benchmark_register.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\colorprint.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\commandlineflags.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\complexity.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\console_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\csv_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\json_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\sleep.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\string_util.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\sysinfo.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ProjectDir)..\src\timers.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\benchmark_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\include\benchmark\reporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\arraysize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\benchmark_api_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\check.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\colorprint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\commandlineflags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\complexity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\cycleclock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\internal_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\re.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\sleep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\string_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\sysinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(ProjectDir)..\src\timers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
