@@ -27,8 +27,8 @@
       <DisableSpecificWarnings>4251;4514;4571;4710;4711;4820;4987</DisableSpecificWarnings>
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>$(SolutionDir)..\src;C:\Boost\include\boost-1_62;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>Precompiled.hpp</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>Precompiled.hpp</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>precompiled.hpp</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompiled.hpp</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
