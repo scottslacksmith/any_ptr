@@ -1,7 +1,6 @@
 #pragma once
 #include <utility>
 #include <typeinfo>
-#include <type_traits>
 #include <optional>
 
 namespace xxx {
@@ -31,7 +30,7 @@ namespace xxx {
         std::any_cast<Base*>( a1 ); // throws exceptions as there's no implicit up cast
 
         xxx::any_ptr a2{ p };
-        xxx::any_ptr_cast<Base>( a1 ); // implicit up cast succeeds
+        xxx::any_ptr_cast<Base*>( a1 ); // implicit up cast succeeds
     */
     class any_ptr
     {
@@ -61,32 +60,40 @@ namespace xxx {
       //-----------------------------------------------------
       // Modifiers
 
-      // swaps two any objects
-      void swap(any_ptr & other) noexcept;
-
-      // reset to empty state 
+      // Reset to empty state 
       void reset() noexcept;
+
+      // Swaps two any objects
+      void swap(any_ptr & other) noexcept;
 
       //-----------------------------------------------------
       // Observers
 
-      // return true if not empty
+      // Returns true if instance is non-empty.
       bool has_value() const noexcept { return my_throw_func != nullptr; }
 
-      // Return type-info for held T
+      // Returns the typeid(T*) of the contained pointer T* if instance is non-empty,
+      // otherwise typeid(void).
       const std::type_info& type() const noexcept { return *my_type_info; }
 
     private:
 
-      using Throw_func = void(void *);
-
       template<typename T>
       using HeldType = T;
 
+      using Throw_func = void(void *);
+
+      // The held pointer
       void*                   my_ptr{ nullptr };
+      // The throw function that implements a dynamic up cast
       Throw_func *            my_throw_func{ nullptr };
+      // The typeid(T*) of the held pointer, 
+      // otherwise set to typeid(void) to indicate an empty state.
       const std::type_info *  my_type_info{ & typeid(void) };
 
+      // Attempt a dynamic up cast to T to replicate an implicit up cast. 
+      // If the cast is successful then return { ptr , true } where ptr is the casted pointer
+      // otherwise return { nullptr , false }
       template <typename T>
       std::pair<T*,bool> dynamic_up_cast() const noexcept;
 
@@ -111,16 +118,16 @@ namespace xxx {
     {
     }
 
-    void any_ptr::swap(any_ptr & other) noexcept
-    {
-      other = std::exchange(*this, std::move(other));
-    }
-
     // reset to empty state 
     inline void any_ptr::reset() noexcept
     {
       // Use default ctor to reset to empty state
       ::new (this) any_ptr();
+    }
+
+    void any_ptr::swap(any_ptr & other) noexcept
+    {
+      other = std::exchange(*this, std::move(other));
     }
 
     template <typename T>
@@ -131,18 +138,18 @@ namespace xxx {
         result.first = static_cast<T*>(my_ptr);
         result.second = true;
       }
-      else if (has_value()) { // try an implicit up cast by throwing an exception
+      else if (has_value()) { // attempt a dynamic up cast by throwing an exception
         try {
           my_throw_func(const_cast<void*>(my_ptr));
         }
-        catch (T* ptr) { // implicit up cast succeeded
+        catch (T* ptr) { // up cast succeeded
           result.first = ptr;
           result.second = true;
         }
         catch (...) { // up cast failed
         }
       }
-      // else cast is not permitted by C++ CV qualifier promotion rules
+      // else dynamic up cast failed
       return result;
     }
 
