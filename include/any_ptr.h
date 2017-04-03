@@ -1,7 +1,11 @@
 #pragma once
 #include <utility>
 #include <typeinfo>
+#ifdef _MSC_VER
 #include <optional>
+#else
+#include <experimental/optional>
+#endif
 
 namespace xxx {
 
@@ -93,7 +97,7 @@ namespace xxx {
 
       // Attempt a dynamic up cast to T to replicate an implicit up cast. 
       // If the cast is successful then return { ptr , true } where ptr is the casted pointer
-      // otherwise return { nullptr , false }
+      // otherwise return { nullptr , false }.
       template <typename T>
       std::pair<T*,bool> dynamic_up_cast() const noexcept;
 
