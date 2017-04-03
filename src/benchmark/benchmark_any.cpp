@@ -4,6 +4,10 @@
   #include <any>
 #else
   #include <experimental/any>
+  namespace std {
+    using std::experimental::any;
+    using std::experimental::any_cast;
+  } // namespace std
 #endif
 
 namespace  {

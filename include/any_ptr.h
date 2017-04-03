@@ -3,9 +3,17 @@
 #include <typeinfo>
 #include <type_traits>
 #ifdef _MSC_VER
-#include <optional>
+  #include <optional>
 #else
-#include <experimental/optional>
+  #if __has_include(<optional>)
+fdsgdfgds
+    #include <optional>
+  #else
+    #include <experimental/optional>
+    namespace std {
+      using std::experimental::optional;
+    } // namespace std
+  #endif
 #endif
 
 #ifdef _MSC_VER
