@@ -85,8 +85,7 @@ namespace xxx {
         virtual bool                    unique() const noexcept = 0;
         virtual const IHolder *         clone(void* const inplaceMemory) const noexcept = 0;
         virtual void                    try_up_cast_by_throwing() const = 0;
-        virtual std::shared_ptr<void>   make_shared_ptr_alias(const void * ptr) const noexcept = 0;
-        virtual std::shared_ptr<void>   make_shared_ptr_alias(const volatile void * ptr) const noexcept = 0;
+        virtual std::shared_ptr<void>   make_shared_ptr_alias(void * ptr) const noexcept = 0;
       };
 
 
@@ -107,14 +106,9 @@ namespace xxx {
 
         void                    try_up_cast_by_throwing() const final { throw my_ptr.get(); }
 
-        std::shared_ptr<void>   make_shared_ptr_alias(const void* p) const noexcept final 
+        std::shared_ptr<void>   make_shared_ptr_alias(void* p) const noexcept final 
         { 
-          return std::shared_ptr<void>(my_ptr, const_cast<void*>(p));  
-        }
-
-        std::shared_ptr<void> make_shared_ptr_alias(const volatile void* p) const noexcept final 
-        { 
-          return std::shared_ptr<void>(my_ptr, const_cast<void*>(p)); 
+          return std::shared_ptr<void>(my_ptr, p);  
         }
 
         // The held shared_ptr
@@ -231,7 +225,7 @@ namespace xxx {
             pholder->try_up_cast_by_throwing();
           }
           catch (T* p) { // implicit up cast succeeded
-            result = std::static_pointer_cast<T>(pholder->make_shared_ptr_alias(p));
+            result = std::static_pointer_cast<T>(pholder->make_shared_ptr_alias(const_cast<std::remove_cv_t<T>*>(p)));
             cast_ok = true;
           }
           catch (...) { // up cast failed

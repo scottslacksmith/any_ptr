@@ -34,5 +34,8 @@
     <ClCompile Include="benchmark_any.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="benchmark_any_shared_ptr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

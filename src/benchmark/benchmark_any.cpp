@@ -54,7 +54,7 @@ static void any_cast(benchmark::State& state) {
 	state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("std::any_cast - success",any_cast);
+BENCHMARK_WITH_NAME("any_cast - success",any_cast);
 
 
 //-----------------------------------------------------------------------------
@@ -87,4 +87,4 @@ static void bad_any_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("std::any_cast - failure by throwing std::bad_any_cast", bad_any_cast);
+BENCHMARK_WITH_NAME("any_cast - failure by throwing std::bad_any_cast", bad_any_cast);
