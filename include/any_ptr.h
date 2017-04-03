@@ -27,7 +27,7 @@ namespace xxx {
 
         std::any a1{ p };
         std::any_cast<Derived*>( a1 ); // cast succeeds
-        std::any_cast<Base*>( a1 ); // throws exceptions as there's no implicit up cast
+        std::any_cast<Base*>( a1 ); // cast fails as there's no implicit up cast
 
         xxx::any_ptr a2{ p };
         xxx::any_ptr_cast<Base*>( a1 ); // implicit up cast succeeds
