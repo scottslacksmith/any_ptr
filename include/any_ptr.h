@@ -40,7 +40,7 @@ namespace xxx {
     {
     public:
       //-----------------------------------------------------
-      // Canonical "Rule of 5" ctors/dtor and copy operators
+      // Canonical "Rule of 5" ctors, dtor and copy operators
 
       ~any_ptr() = default;
 
