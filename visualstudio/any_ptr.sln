@@ -16,6 +16,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{70F564CB-8B17-4A39-938B-83945024DD32}"
 	ProjectSection(SolutionItems) = preProject
 		..\include\any_ptr.h = ..\include\any_ptr.h
+		..\include\any_shared_ptr.h = ..\include\any_shared_ptr.h
 	EndProjectSection
 EndProject
 Global
