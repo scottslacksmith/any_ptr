@@ -16,6 +16,7 @@
 // TODO: reference additional headers your program requires here
 #ifdef _MSC_VER
 #pragma warning(push, 2)
+#pragma warning(disable : 26493) // Disable the C++ Core Guidelines warnings
 #endif
 
 #include <benchmark/benchmark.h>

@@ -1,10 +1,16 @@
 #pragma once
 #include <utility>
 #include <typeinfo>
+#include <type_traits>
 #ifdef _MSC_VER
 #include <optional>
 #else
 #include <experimental/optional>
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 26461 26493 26496) // Disable various GSL warnings emitted the code analyzer
 #endif
 
 namespace xxx {
@@ -83,7 +89,10 @@ namespace xxx {
     private:
 
       template<typename T>
-      using HeldType = T;
+      using HeldBaseType = T;
+
+      template<typename T>
+      using HeldType = std::add_pointer_t<T>;
 
       using Throw_func = void(void *);
 
@@ -102,7 +111,7 @@ namespace xxx {
       std::pair<T*,bool> dynamic_up_cast() const noexcept;
 
       template<typename T>
-      static void throw_function(void * ptr)
+      static void throw_function(void * const ptr)
       {
         throw static_cast<T*>(ptr);
       }
@@ -116,9 +125,9 @@ namespace xxx {
 
     template<typename T>
     any_ptr::any_ptr(T* ptr) noexcept
-      : my_ptr{ const_cast<HeldType<T>*> (ptr) }
-      , my_throw_func{ &any_ptr::throw_function<HeldType<T>> }
-      , my_type_info{ & typeid(HeldType<T>*) }
+      : my_ptr{ const_cast<HeldType<T>> (ptr) }
+      , my_throw_func{ &any_ptr::throw_function<HeldBaseType<T>> }
+      , my_type_info{ & typeid(HeldType<T>) }
     {
     }
 
@@ -138,7 +147,7 @@ namespace xxx {
     std::pair<T*, bool> any_ptr::dynamic_up_cast() const noexcept
     {
       std::pair<T*, bool> result{ nullptr, false };
-      if (type() == typeid(HeldType<T>*)) { // cast succeeded
+      if (type() == typeid(HeldType<T>)) { // cast succeeded
         result.first = static_cast<T*>(my_ptr);
         result.second = true;
       }
@@ -146,7 +155,7 @@ namespace xxx {
         try {
           my_throw_func(const_cast<void*>(my_ptr));
         }
-        catch (T* ptr) { // up cast succeeded
+        catch (T* const ptr) { // up cast succeeded
           result.first = ptr;
           result.second = true;
         }
@@ -193,3 +202,8 @@ namespace std {
   }
 
 } // namespace std
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
