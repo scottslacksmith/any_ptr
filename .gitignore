@@ -11,3 +11,4 @@
 /Makefile
 /CMakeCache.txt
 /src/benchmark/Makefile
+/src/benchmark/benchmark
