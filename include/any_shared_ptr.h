@@ -2,7 +2,18 @@
 #include <memory>
 #include <typeinfo>
 #include <type_traits>
-#include <optional>
+#ifdef _MSC_VER
+  #include <optional>
+#else
+  #if __has_include(<optional>) // requires GCC 5 or greater
+    #include <optional>
+  #else
+    #include <experimental/optional>
+    namespace std {
+      using std::experimental::optional;
+    } // namespace std
+  #endif
+#endif
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -125,7 +136,7 @@ namespace xxx {
       // Pointer to my_inplace_storage that holds Holder<T> 
       const IHolder *  holder() const noexcept 
       { 
-        [[gsl::suppress(type.1)]]  // warning C26490 : Don't use reinterpret_cast. (type.1)
+        // [[gsl::suppress(type.1)]]  // warning C26490 : Don't use reinterpret_cast. (type.1)
         return reinterpret_cast<const IHolder *>(&my_inplace_storage); 
       }
 
@@ -147,7 +158,7 @@ namespace xxx {
       ::new (&my_inplace_storage) Holder<T>(std::move(ptr));
     }
 
-    [[gsl::suppress(type.6)]] //  warning C26495 : Variable 'xxx::ver_1::any_shared_ptr::my_inplace_storage' is uninitialized.Always initialize a member variable. (type.6)
+    // [[gsl::suppress(type.6)]] //  warning C26495 : Variable 'xxx::ver_1::any_shared_ptr::my_inplace_storage' is uninitialized.Always initialize a member variable. (type.6)
     inline any_shared_ptr::any_shared_ptr() noexcept
     {
       ::new (&my_inplace_storage) Holder<void>();
@@ -216,7 +227,7 @@ namespace xxx {
       if (has_value()) {
         const IHolder * pholder{ holder() };
         if (type() == typeid(HeldType<T>)) {
-          [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
+          // [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
           result = static_cast<const Holder<T>*>(pholder)->my_ptr;
           cast_ok = true;
         }
