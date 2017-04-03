@@ -5,8 +5,7 @@
 #ifdef _MSC_VER
   #include <optional>
 #else
-  #if __has_include(<optional>)
-fdsgdfgds
+  #if __has_include(<optional>) // requires GCC 5 or greater
     #include <optional>
   #else
     #include <experimental/optional>

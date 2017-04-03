@@ -5,3 +5,9 @@
 /build
 /visualstudio/.vs/any_ptr/v15
 /.vs
+/CMakeFiles
+/src/benchmark/CMakeFiles
+*.cmake
+/Makefile
+/CMakeCache.txt
+/src/benchmark/Makefile

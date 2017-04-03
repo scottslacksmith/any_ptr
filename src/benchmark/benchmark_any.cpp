@@ -3,11 +3,15 @@
 #ifdef _MSC_VER
   #include <any>
 #else
-  #include <experimental/any>
-  namespace std {
-    using std::experimental::any;
-    using std::experimental::any_cast;
-  } // namespace std
+  #if __has_include(<optional>) // requires GCC 5 or greater
+    #include <any>
+  #else
+    #include <experimental/any>
+    namespace std {
+      using std::experimental::any;
+      using std::experimental::any_cast;
+    } // namespace std
+  #endif
 #endif
 
 namespace  {
