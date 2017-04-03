@@ -1,5 +1,4 @@
 #pragma once
-
 #include <benchmark/benchmark.h>
 
 #define BENCHMARK_WITH_NAME(name,function)                     \

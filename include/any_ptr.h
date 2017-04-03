@@ -10,7 +10,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable: 26461 26493 26496) // Disable various GSL warnings emitted the code analyzer
+#pragma warning(disable: 26461 26493 26496) // disable various GSL warnings emitted the code analyzer
 #endif
 
 namespace xxx {
