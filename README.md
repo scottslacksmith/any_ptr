@@ -1,5 +1,5 @@
 # any_ptr
-This project implements 2 complementary C++ classes for ```std::any```
+This project implements the following 2 complementary C++ classes for C++17's ```std::any```;
 
 1. ```any_ptr``` - a type-safe container for pointers of any type. 
 
