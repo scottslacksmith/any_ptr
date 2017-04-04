@@ -1,9 +1,9 @@
 # any_ptr
-This project implements 2 complimentary C++ classes for ```std::any```
+This project implements 2 complementary C++ classes for ```std::any```
 
-1. ```any_ptr```
+1. ```any_ptr``` - a type-safe container for pointers of any type. 
 
-2. ```any_shared_ptr```
+2. ```any_shared_ptr```- a type-safe container for any std::shared_ptr. 
 
 that, unlike ```std::any```,  preserves the cv-qualifier rules and the implicit up cast behaviour of pointers. 
 
