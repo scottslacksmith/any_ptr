@@ -3,7 +3,7 @@
 #include <typeinfo>
 #include <type_traits>
 #ifdef _MSC_VER
-  #ifdef _HAS_CXX17
+  #if _HAS_CXX17 != 0
     #include <optional>
     #define ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
   #endif
@@ -148,8 +148,13 @@ namespace xxx {
       template<typename T>
       friend std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr);
 
+#ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL
       template<typename T>
       friend std::optional<std::shared_ptr<T>> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept;
+#else // replace std::optional<std::shared_ptr<T>> with std::pair<std::shared_ptr<T>,bool>
+      template<typename T>
+      std::pair<std::shared_ptr<T>, bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept;
+#endif
 
     };
 
