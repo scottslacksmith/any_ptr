@@ -3,15 +3,20 @@
 #include <typeinfo>
 #include <type_traits>
 #ifdef _MSC_VER
-  #include <optional>
-#else
+  #ifdef _HAS_CXX17
+    #include <optional>
+    #define ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
+  #endif
+#else // GCC
   #if __has_include(<optional>) // requires GCC 5 or greater
     #include <optional>
+    #define ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
   #else
     #include <experimental/optional>
     namespace std {
       using std::experimental::optional;
     } // namespace std
+    #define ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
   #endif
 #endif
 
@@ -259,6 +264,8 @@ namespace xxx {
       throw bad_any_shared_ptr_cast();
     }
 
+#ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL
+
     template<typename T>
     std::optional<std::shared_ptr<T>> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
     {
@@ -270,6 +277,18 @@ namespace xxx {
       }
       return result;
     }
+
+#else // replace std::optional<std::shared_ptr<T>> with std::pair<std::shared_ptr<T>,bool>
+
+    template<typename T>
+    std::pair<std::shared_ptr<T>,bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
+    {
+      bool is_cast_ok{ false };
+      const std::shared_ptr<T> cast_result = anySharedPtr->template cast<T>(is_cast_ok);
+      return std::make_pair(cast_result, is_cast_ok);
+    }
+
+#endif
 
   } // namespace ver_1
 
@@ -298,3 +317,7 @@ namespace std {
   }
 
 } // namespace std
+
+#ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
+#undef ANY_SHARED_PTR_HAS_LIB_OPTIONAL 
+#endif

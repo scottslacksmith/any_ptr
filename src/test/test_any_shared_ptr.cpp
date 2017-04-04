@@ -144,7 +144,7 @@ TEST(any_shared_ptr, make_any_shared_ptr)
   }
   // Test with 2 arguments
   {
-    auto any = make_any_shared_ptr<pair<int,string>>(42,"test");
+    auto any = make_any_shared_ptr<pair<int, string>>(42,"test");
 
     ASSERT_TRUE(any.has_value());
     ASSERT_EQ(any.type(),typeid(shared_ptr<pair<int, string>>));
