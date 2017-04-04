@@ -3,7 +3,7 @@
 #ifdef _MSC_VER
   #include <any>
 #else
-  #if __has_include(<optional>) // requires GCC 5 or greater
+  #if __has_include(<any>) // requires GCC 5 or greater
     #include <any>
   #else
     #include <experimental/any>

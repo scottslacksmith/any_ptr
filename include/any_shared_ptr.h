@@ -20,13 +20,6 @@
   #endif
 #endif
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-// Silence the 'unused-function' warning that first appeared when using GCC 6.2.
-// This warning wasn't emitted by GCC 4.9 so I suspect it's a false positive.
-#pragma GCC diagnostic ignored "-Wunused-function"
-#endif
-
 namespace xxx {
 
   class bad_any_shared_ptr_cast : public std::bad_cast
@@ -306,10 +299,6 @@ namespace xxx {
   {
     return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) };
   }
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 } // namespace xxx {
 
