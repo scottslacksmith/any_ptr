@@ -273,6 +273,16 @@ namespace xxx {
 
   } // namespace ver_1
 
+  // Constructs an any object containing an object of type shared_ptr<T>, 
+  // passing the provided arguments to std::make_shared<T>.
+  // Is equivalent to 
+  //    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) }
+  template<class T, class... Args>
+  inline   any_shared_ptr make_any_shared_ptr(Args&&... args)
+  {
+    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) };
+  }
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif

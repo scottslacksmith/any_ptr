@@ -101,8 +101,6 @@ TEST(any_shared_ptr, const_promotion)
   }
 }
 
-
-
 TEST(any_shared_ptr, VolatilePromotion)
 {
   // Test non-volatile -> volatile & non-volatile cast
@@ -130,5 +128,28 @@ TEST(any_shared_ptr, VolatilePromotion)
     EXPECT_THROW(any_shared_ptr_cast<int>(anyPtr), bad_any_shared_ptr_cast);
     EXPECT_NO_THROW(any_shared_ptr_cast<int volatile>(anyPtr));
     ASSERT_EQ(ptr.get(), any_shared_ptr_cast<int volatile>(anyPtr).get());
+  }
+}
+
+TEST(any_shared_ptr, make_any_shared_ptr)
+{
+  // Test 0 arguments
+  {
+    auto any = make_any_shared_ptr<int>();
+
+    ASSERT_TRUE(any.has_value());
+    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+    auto ptr = any_shared_ptr_cast<int>(any);
+    ASSERT_EQ(*ptr, 0);
+  }
+  // Test with 2 arguments
+  {
+    auto any = make_any_shared_ptr<pair<int,string>>(42,"test");
+
+    ASSERT_TRUE(any.has_value());
+    ASSERT_EQ(any.type(),typeid(shared_ptr<pair<int, string>>));
+    auto ptr = any_shared_ptr_cast<pair<int, string>>(any);
+    ASSERT_EQ(ptr->first, 42);
+    ASSERT_EQ(ptr->second, "test");
   }
 }
