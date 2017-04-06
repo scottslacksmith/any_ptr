@@ -65,13 +65,13 @@ const Derived* const_derived = any_ptr_cast< const Derived >( any );
 // OK - implicit upcast is supported
 Base* base = any_ptr_cast< Base >( any );  
 ```
-Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store *objects* and not *references* to an object. In contrast ```any_ptr```/```any_shared_ptr``` are designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a performance cost.
+Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or implicit up cast behaviour. This is not a ```std::any``` defect. It's specifically designed to store *objects* and not *references* to an object. In contrast ```any_ptr```/```any_shared_ptr``` are designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a performance cost.
 ## What's the catch
 
 ```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by Cassio Neri [[1]](#references).   
 
 ### The performance penalty
-C++ exceptions are intended to used as an error reporting mechanism and thus the performance of try/catch is optimised for the situation when no exception is thrown. Consequently we can expect a performance penalty if our implementation is based on throwing and catching exceptions. Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
+C++ exceptions are intended to used as an error reporting mechanism and thus the performance of try/catch blocks are optimised for the situation when no exception is thrown. Consequently we can expect a performance penalty if our normal non-error code path is based on throwing and catching exceptions. Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
 
 |Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
 |-|-|-|-|
