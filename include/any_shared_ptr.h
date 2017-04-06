@@ -335,7 +335,7 @@ namespace xxx {
       const std::type_info & type() const noexcept;
 
       // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
-      bool  unique() const noexcept;
+      bool  unique() const noexcept { return my_shared_ptr.unique(); }
 
     private:
 
@@ -406,11 +406,6 @@ namespace xxx {
       return * my_type_info;
     }
 
-    inline bool  any_shared_ptr::unique() const noexcept
-    {
-      return my_shared_ptr.unique();
-    }
-
     template <typename T>
     std::shared_ptr<T> any_shared_ptr::dynamic_up_cast(bool & cast_ok) const noexcept
     {
@@ -441,7 +436,7 @@ namespace xxx {
     std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr)
     {
       bool is_cast_ok{ false };
-      const std::shared_ptr<T> result = anySharedPtr.template dynamic_up_cast<T>(is_cast_ok);
+      const std::shared_ptr<T> result( anySharedPtr.template dynamic_up_cast<T>(is_cast_ok) );
       if (is_cast_ok) {
         return result;
       }
