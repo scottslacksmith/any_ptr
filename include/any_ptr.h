@@ -103,13 +103,13 @@ namespace xxx {
 
       using Throw_func = void(void *);
 
+      // The typeid(T*) of the held pointer, 
+      // otherwise set to typeid(void) to indicate an empty state.
+      const std::type_info *  my_type_info{ &typeid(void) };
       // The held pointer
       void*                   my_ptr{ nullptr };
       // The throw function that implements a dynamic up cast
       Throw_func *            my_throw_func{ nullptr };
-      // The typeid(T*) of the held pointer, 
-      // otherwise set to typeid(void) to indicate an empty state.
-      const std::type_info *  my_type_info{ & typeid(void) };
 
       // Attempt a dynamic up cast to T to replicate an implicit up cast. 
       // If the cast is successful then return { ptr , true } where ptr is the casted pointer
@@ -132,9 +132,9 @@ namespace xxx {
 
     template<typename T>
     any_ptr::any_ptr(T* ptr) noexcept
-      : my_ptr{ const_cast<HeldType<T>> (ptr) }
+      : my_type_info{ &typeid(HeldType<T>) }
+      , my_ptr{ const_cast<HeldType<T>> (ptr) }
       , my_throw_func{ &any_ptr::throw_function<HeldBaseType<T>> }
-      , my_type_info{ & typeid(HeldType<T>) }
     {
     }
 

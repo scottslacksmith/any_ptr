@@ -360,11 +360,12 @@ namespace xxx {
 
       using Operation_func =  void(void *);
 
-      const std::type_info *  my_type_info{ nullptr };
       // The typeid(shared_ptr<T*) of the held shared_ptr, 
       // otherwise set to typeid(void) to indicate an empty state.
+      const std::type_info *  my_type_info{ nullptr };
+      // The held shared_ptr, 
       std::shared_ptr<void>   my_shared_ptr{ nullptr };
-      //
+      // The throw function that implements a dynamic up cast
       Operation_func *        my_throw_func{ nullptr };
 
       template<typename T>
@@ -390,8 +391,8 @@ namespace xxx {
 
     template<typename T>
     any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
-      : my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(ptr) }
-      , my_type_info{ & typeid(HeldType<T>) }
+      : my_type_info{ & typeid(HeldType<T>) }
+      , my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(ptr) }
       , my_throw_func{ & any_shared_ptr::throw_func<HeldBaseType<T>> }
     {
     }
