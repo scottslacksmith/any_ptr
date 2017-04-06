@@ -5,11 +5,11 @@ This project implements the following 2 complementary C++ classes for C++17's ``
 
 2. ```any_shared_ptr```- a type-safe container for std::shared_ptr<T> of any type T. 
 
-that, unlike ```std::any```,  preserves the cv-qualifier promotion rules and the implicit up cast behaviour of pointers. 
+that, unlike ```std::any```,  preserves pointer cv-qualifier promotion and implicit upcast behaviour. 
 
 ## Why do we need any_shared_ptr
 
-Consider
+Consider following trivial example:
 ```
 struct Base {};
 
@@ -17,41 +17,58 @@ struct Derived : public Base {};
 
 std::shared_ptr<Derived> ptr = std::make_shared<Derived>();
 ```
-```std::any``` can quite happily store ```std::shared_ptr<Derived>``` but its pointer sematics are lost. 
+You can use ```std::any``` to store ```std::shared_ptr<Derived>``` but its pointer semantics are lost. 
 
 ```
 using namespace std;
 
 any any{ ptr };
 
-// OK when casting to the same cv-qualified type
+// OK  - casting to the same cv-qualified type
 shared_ptr<Derived> derived = any_cast<shared_ptr<Derived>>( any );  
 
-// THROWS std::bad_any_cast - no implicit cv-qualifier promotion
-shared_ptr<const Derived> derived = any_cast<shared_ptr<const Derived>>( any );  
+// FAILED - throws std::bad_any_cast as there's no implicit cv-qualifier promotion
+shared_ptr<const Derived> const_derived = any_cast<shared_ptr<const Derived>>( any );  
 
-// THROWS std::bad_any_cast - no implicit upcast
+// FAILED - throws std::bad_any_cast as there's no implicit upcast
 shared_ptr<Base> base = any_cast<shared_ptr<Base>>( any );
 ```
-Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store *objects* and not *references* to an object. 
+Now consider ```any_shared_ptr```
 ```
 using namespace std;
 
 any_share_ptr any{ ptr };
 
-// OK when casting to the same cv-qualified type
+// OK  - casting to the same cv-qualified type
 shared_ptr<Derived> derived = any_shared_ptr_cast<shared_ptr<Derived>>( any );  
 
-// OK - implicit upcast is supported by any_share_ptr
-shared_ptr<Base> base = any_shared_ptr_cast<std::shared_ptr<Base>>( any );  
+// OK - implicit cv-qualifier promotion is supported
+shared_ptr<const Derived> const_derived = any_shared_ptr_cast<shared_ptr<const Derived>>( any );  
 
-// OK - implicit cv-qualifier promotion ia supported by any_shaared_ptr
-shared_ptr<const Derived> derived = any_shared_ptr_cast<shared_ptr<const Derived>>( any );  
+// OK - implicit upcast is supported
+shared_ptr<Base> base = any_shared_ptr_cast<std::shared_ptr<Base>>( any );  
 ```
-In contrast ```any_shared_ptr``` is designed to store references to objects and thus preserves normal pointer behaviour but there's is performance cost.
+and ```any_ptr```.
+```
+using namespace std;
+
+Derived * p = ptr.get(); 
+
+any_ptr any{ p };
+
+// OK  - casting to the same cv-qualified type
+Derived* derived = any_ptr_cast<Derived>( any );  
+
+// OK - implicit cv-qualifier promotion is supported
+const Derived* const_derived = any_ptr_cast<const Derived>( any );  
+
+// OK - implicit upcast is supported
+Base* base = any_ptr_cast<Base>( any );  
+```
+Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store *objects* and not *references* to an object. In contrast ```any_ptr```/```any_shared_ptr``` are designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a performance cost.
 ## What's the catch
 
-```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by [[1]](#references) Cassio Neri.   
+```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by Cassio Neri [[1]](#references).   
 
 ### The performance penalty
 C++ exceptions are intended to used as an error reporting mechanism and thus the performance of try/catch is optimised for the situation when no exception is thrown. Consequently we can expect a performance penalty if our implementation is based on throwing and catching exceptions. Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
