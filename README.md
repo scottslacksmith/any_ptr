@@ -33,7 +33,7 @@ shared_ptr<const Derived> derived = any_cast<shared_ptr<const Derived>>( any );
 // THROWS std::bad_any_cast - no implicit upcast
 shared_ptr<Base> base = any_cast<shared_ptr<Base>>( any );
 ```
-Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer's cv-qualifier promotion rules and implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store objects and not references to an object. In contrast ```any_shared_ptr``` is designed to store references to objects and thus preserves normal pointer behaviour.
+Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer> cv-qualifier promotion or implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store objects and not references to an object. 
 ```
 using namespace std;
 
@@ -48,10 +48,10 @@ shared_ptr<Base> base = any_shared_ptr_cast<std::shared_ptr<Base>>( any );
 // OK - implicit cv-qualifier promotion ia supported by any_shaared_ptr
 shared_ptr<const Derived> derived = any_shared_ptr_cast<shared_ptr<const Derived>>( any );  
 ```
-
+In contrast ```any_shared_ptr``` is designed to store references to objects and thus preserves normal pointer behaviour but there's is performance cost.
 ## What's the catch
 
-```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by Cassio Neri (see [[1]](#heading references)).   
+```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by Cassio Neri (see [1](#heading references)).   
 
 ### The performance penalty
 C++ exceptions are intended to used as an error reporting mechanism and thus the performance of try/catch is optimised for the situation when no exception is thrown. Consequently we can expect a performance penalty if our implementation is based on throwing and catching exceptions. Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
