@@ -271,7 +271,7 @@ namespace xxx {
       bool is_cast_ok{ false };
       const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
       if (is_cast_ok) {
-        result = cast_result;
+        result = std::move(cast_result);
       }
       return result;
     }
@@ -283,12 +283,217 @@ namespace xxx {
     {
       bool is_cast_ok{ false };
       const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
-      return std::make_pair(cast_result, is_cast_ok);
+      return std::make_pair(cast_result, std::move(is_cast_ok));
     }
 
 #endif
 
   } // namespace ver_1
+
+
+  namespace ver_2 {
+
+    class any_shared_ptr
+    {
+    public:
+      //-----------------------------------------------------
+      // Canonical "Rule of 5" ctors/dtor and copy operators
+
+      ~any_shared_ptr() = default;
+
+      any_shared_ptr(any_shared_ptr const & other) noexcept = default;
+
+      any_shared_ptr(any_shared_ptr && other) noexcept = default;
+
+      any_shared_ptr& operator=(any_shared_ptr const& other) noexcept = default;
+
+      any_shared_ptr& operator=(any_shared_ptr && other) noexcept = default;
+
+      //-----------------------------------------------------
+      // ctors
+
+      template<typename T>
+      any_shared_ptr(std::shared_ptr<T> ptr) noexcept;
+
+      any_shared_ptr() noexcept;
+
+      //-----------------------------------------------------
+      // Modifiers
+
+      void swap(any_shared_ptr & other) noexcept;
+
+      // reset to empty state 
+      void reset() noexcept { ::new (this) any_shared_ptr(); }
+
+      //-----------------------------------------------------
+      // Observers
+
+      // return true if not empty
+      bool has_value() const noexcept { return my_operation_func != nullptr; }
+
+      // Return the T's type-info for the held by shared_ptr<T>
+      const std::type_info & type() const noexcept;
+
+      // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
+      bool  unique() const noexcept;
+
+    private:
+
+      template<typename T>
+      using HeldBaseType = T;
+
+      template<typename T>
+      using HeldBaseUnqualifiedType = std::remove_cv_t<HeldBaseType<T>>;
+
+      template<typename T>
+      using HeldType = std::shared_ptr<T>;
+
+
+      template <typename T>
+      std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept;
+
+      enum Operator
+      {
+        Op_type,
+        Op_throw,
+      };
+
+      union OpResult
+      {
+        const std::type_info * my_type_info;
+      };
+
+      template<typename T>
+      static void operation(OpResult& result, Operator oper, void * ptr)
+      {
+        switch (oper)
+        {
+        case Op_type:
+          result.my_type_info = & typeid(HeldType<T>);
+          break;
+        case Op_throw:
+          throw static_cast<T*>(ptr);
+        }
+      }
+
+      using Operation_func = void(OpResult& , Operator , void *);
+
+      // The held shared_ptr
+      std::shared_ptr<void>   my_shared_ptr;
+      //
+      Operation_func *        my_operation_func{ nullptr };
+
+      template<typename T>
+      friend std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr);
+
+#ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL
+      template<typename T>
+      friend std::optional<std::shared_ptr<T>> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept;
+#else // replace std::optional<std::shared_ptr<T>> with std::pair<std::shared_ptr<T>,bool>
+      template<typename T>
+      std::pair<std::shared_ptr<T>, bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept;
+#endif
+
+    };
+
+    //-----------------------------------------------------------------------------------------------------
+    // Implementation
+
+    template<typename T>
+    any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
+      : my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(ptr) }
+      , my_operation_func{ & any_shared_ptr::operation<HeldBaseType<T>> }
+    {
+    }
+
+    inline void any_shared_ptr::swap(any_shared_ptr & other) noexcept
+    {
+      other = std::exchange(*this, std::move(other));
+    }
+
+    inline const std::type_info & any_shared_ptr::type() const noexcept
+    {
+      if ( my_operation_func )
+      {
+        OpResult result;
+        my_operation_func(result, Op_type, nullptr);
+        return * result.my_type_info;
+      }
+      return typeid(void);
+    }
+
+    inline bool  any_shared_ptr::unique() const noexcept
+    {
+      return my_shared_ptr.unique();
+    }
+
+    template <typename T>
+    std::shared_ptr<T> any_shared_ptr::dynamic_up_cast(bool & cast_ok) const noexcept
+    {
+      std::shared_ptr<T> result;
+      if (has_value()) {
+        if (type() == typeid(HeldType<T>)) {
+          // [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
+          result = static_pointer_cast<T>(my_shared_ptr);
+          cast_ok = true;
+        }
+        else { // try an implicit up cast by throwing an exception
+          try {
+            OpResult res;
+            my_operation_func(res, Op_throw, my_shared_ptr.get());
+          }
+          catch (T* p) { // implicit up cast succeeded
+            result = std::shared_ptr<T>(my_shared_ptr, p);
+            cast_ok = true;
+          }
+          catch (...) { // up cast failed
+          }
+        }
+      }
+      return result;
+    }
+
+    //-----------------------------------------------------------------------------------------------------
+
+    template<typename T>
+    std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr)
+    {
+      bool is_cast_ok{ false };
+      const std::shared_ptr<T> result = anySharedPtr.template dynamic_up_cast<T>(is_cast_ok);
+      if (is_cast_ok) {
+        return result;
+      }
+      throw bad_any_shared_ptr_cast();
+    }
+
+#ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL
+
+    template<typename T>
+    std::optional<std::shared_ptr<T>> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
+    {
+      std::optional<std::shared_ptr<T>> result;
+      bool is_cast_ok{ false };
+      const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
+      if (is_cast_ok) {
+        result = cast_result;
+      }
+      return result;
+    }
+
+#else // replace std::optional<std::shared_ptr<T>> with std::pair<std::shared_ptr<T>,bool>
+
+    template<typename T>
+    std::pair<std::shared_ptr<T>, bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
+    {
+      bool is_cast_ok{ false };
+      const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
+      return std::make_pair(cast_result, is_cast_ok);
+    }
+
+#endif
+
+  } // namespace ver_2
+
 
   // Constructs an any object containing an object of type shared_ptr<T>, 
   // passing the provided arguments to std::make_shared<T>.
