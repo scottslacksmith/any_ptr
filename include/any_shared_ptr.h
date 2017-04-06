@@ -329,7 +329,7 @@ namespace xxx {
       // Observers
 
       // return true if not empty
-      bool has_value() const noexcept { return my_operation_func != nullptr; }
+      bool has_value() const noexcept { return my_throw_func != nullptr; }
 
       // Return the T's type-info for the held by shared_ptr<T>
       const std::type_info & type() const noexcept;
@@ -352,36 +352,20 @@ namespace xxx {
       template <typename T>
       std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept;
 
-      enum Operator
-      {
-        Op_type,
-        Op_throw,
-      };
-
-      union OpResult
-      {
-        const std::type_info * my_type_info;
-      };
-
       template<typename T>
-      static void operation(OpResult& result, Operator oper, void * ptr)
+      static void throw_func(void * ptr)
       {
-        switch (oper)
-        {
-        case Op_type:
-          result.my_type_info = & typeid(HeldType<T>);
-          break;
-        case Op_throw:
-          throw static_cast<T*>(ptr);
-        }
+        throw static_cast<T*>(ptr);
       }
 
-      using Operation_func = void(OpResult& , Operator , void *);
+      using Operation_func =  void(void *);
 
-      // The held shared_ptr
-      std::shared_ptr<void>   my_shared_ptr;
+      const std::type_info *  my_type_info{ nullptr };
+      // The typeid(shared_ptr<T*) of the held shared_ptr, 
+      // otherwise set to typeid(void) to indicate an empty state.
+      std::shared_ptr<void>   my_shared_ptr{ nullptr };
       //
-      Operation_func *        my_operation_func{ nullptr };
+      Operation_func *        my_throw_func{ nullptr };
 
       template<typename T>
       friend std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr);
@@ -399,10 +383,16 @@ namespace xxx {
     //-----------------------------------------------------------------------------------------------------
     // Implementation
 
+    inline any_shared_ptr::any_shared_ptr() noexcept
+      : my_type_info{ & typeid(void) }
+    {
+    }
+
     template<typename T>
     any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
       : my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(ptr) }
-      , my_operation_func{ & any_shared_ptr::operation<HeldBaseType<T>> }
+      , my_type_info{ & typeid(HeldType<T>) }
+      , my_throw_func{ & any_shared_ptr::throw_func<HeldBaseType<T>> }
     {
     }
 
@@ -413,13 +403,7 @@ namespace xxx {
 
     inline const std::type_info & any_shared_ptr::type() const noexcept
     {
-      if ( my_operation_func )
-      {
-        OpResult result;
-        my_operation_func(result, Op_type, nullptr);
-        return * result.my_type_info;
-      }
-      return typeid(void);
+      return * my_type_info;
     }
 
     inline bool  any_shared_ptr::unique() const noexcept
@@ -433,14 +417,12 @@ namespace xxx {
       std::shared_ptr<T> result;
       if (has_value()) {
         if (type() == typeid(HeldType<T>)) {
-          // [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
-          result = static_pointer_cast<T>(my_shared_ptr);
+          result = std::static_pointer_cast<T>(my_shared_ptr);
           cast_ok = true;
         }
         else { // try an implicit up cast by throwing an exception
           try {
-            OpResult res;
-            my_operation_func(res, Op_throw, my_shared_ptr.get());
+            my_throw_func(my_shared_ptr.get());
           }
           catch (T* p) { // implicit up cast succeeded
             result = std::shared_ptr<T>(my_shared_ptr, p);
