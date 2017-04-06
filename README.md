@@ -1,57 +1,60 @@
 # any_ptr
 This project implements the following 2 complementary C++ classes for C++17's ```std::any```;
 
-1. ```any_ptr``` - a type-safe container for pointers of any type. 
+1. ```any_ptr``` - a type-safe container for pointers to any type. 
 
-2. ```any_shared_ptr```- a type-safe container for any std::shared_ptr. 
+2. ```any_shared_ptr```- a type-safe container for std::shared_ptr<T> of any type T. 
 
-that, unlike ```std::any```,  preserves the cv-qualifier rules and the implicit up cast behaviour of pointers. 
+that, unlike ```std::any```,  preserves the cv-qualifier promotion rules and the implicit up cast behaviour of pointers. 
 
-This implementation is inspired by [[1]](#heading references) where Cassio Neri observes that C++'s try/catch mechanism can be used to implement the desired behaviour of pointers.   
+## Why do we need any_shared_ptr
 
-## Motivation
-
-### What's wrong with ```std::any``` holding std::shared_ptr
 Consider
 ```
-struct Base {
-};
+struct Base {};
 
-struct Derived : public Base {
-};
+struct Derived : public Base {};
 
-...
+std::shared_ptr<Derived> ptr = std::make_shared<Derived>();
+```
+```std::any``` can quite happily store ```std::shared_ptr<Derived>``` but pointer sematics are lost. 
+
+```
 using namespace std;
 
-any any{ make_shared<Derived>() };
+any any{ ptr };
 
-shared_ptr<Base> base = any_cast<std::shared_ptr<Base>>( any );  // THROWS std::bad_any_cast - no implicit upcast
+// OK when casting to the same cv-qualified type
+shared_ptr<Derived> derived = any_cast<shared_ptr<Derived>>( any );  
 
-shared_ptr<const Derived> derived = any_cast<shared_ptr<const Derived>>( any );  // THROWS std::bad_any_cast - no implicit cv-qualifier promotion
+// THROWS std::bad_any_cast - no implicit cv-qualifier promotion
+shared_ptr<const Derived> derived = any_cast<shared_ptr<const Derived>>( any );  
+
+// THROWS std::bad_any_cast - no implicit upcast
+shared_ptr<Base> base = any_cast<shared_ptr<Base>>( any );
 ```
-
-### Why is ```any_shared_ptr``` better 
+Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer's cv-qualifier promotion rules and implicit up cast behaviour. This not a ```std::any``` defect. It's specifically designed to store objects and not references to an object. In contrast ```any_shared_ptr``` is designed to store references to objects and thus preserves normal pointer behaviour.
 ```
-struct Base {
-};
-
-struct Derived : public Base {
-};
-
-...
 using namespace std;
 
-any_share_ptr any{ make_shared<Derived>() };
+any_share_ptr any{ ptr };
 
-shared_ptr<Base> base = any_shared_ptr_cast<std::shared_ptr<Base>>( any );  // OK - implicit upcast supported
+// OK when casting to the same cv-qualified type
+shared_ptr<Derived> derived = any_shared_ptr_cast<shared_ptr<Derived>>( any );  
 
-shared_ptr<const Derived> derived = any_shared_ptr_cast<shared_ptr<const Derived>>( any );  // OK - implicit cv-qualifier promotion supported
+// OK - implicit upcast is supported by any_share_ptr
+shared_ptr<Base> base = any_shared_ptr_cast<std::shared_ptr<Base>>( any );  
+
+// OK - implicit cv-qualifier promotion ia supported by any_shaared_ptr
+shared_ptr<const Derived> derived = any_shared_ptr_cast<shared_ptr<const Derived>>( any );  
 ```
 
+## What's the catch
 
-## The performance penalty
-The C++ try/catch mechanism has a well deserved reputation for slow performance. 
-Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
+```any_shared_ptr```/```any_ptr``` can recover pointer semantics by using C++'s try/catch mechanism as observed by Cassio Neri (see [[1]](#heading references)).   
+
+### The performance penalty
+The performance of C++ try/catch mechanism is optimised when no exception is thrown. Consequently if our implementation is based on throwing and catching exceptions then we can expect a performance penalty. Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
 
 |Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
 |-|-|-|-|
