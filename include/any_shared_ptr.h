@@ -84,7 +84,7 @@ namespace xxx {
 
 
       template <typename T>
-      std::shared_ptr<T> cast(bool & cast_ok) const noexcept;
+      std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept;
 
       // Base class for the class holds shared_ptr
       struct IHolder
@@ -224,7 +224,7 @@ namespace xxx {
     }
 
     template <typename T>
-    std::shared_ptr<T> any_shared_ptr::cast(bool & cast_ok) const noexcept
+    std::shared_ptr<T> any_shared_ptr::dynamic_up_cast(bool & cast_ok) const noexcept
     {
       std::shared_ptr<T> result;
       if (has_value()) {
@@ -255,7 +255,7 @@ namespace xxx {
     std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr)
     {
       bool is_cast_ok{ false };
-      const std::shared_ptr<T> result = anySharedPtr.template cast<T>(is_cast_ok);
+      const std::shared_ptr<T> result = anySharedPtr.template dynamic_up_cast<T>(is_cast_ok);
       if (is_cast_ok) {
         return result;
       }
@@ -269,7 +269,7 @@ namespace xxx {
     {
       std::optional<std::shared_ptr<T>> result;
       bool is_cast_ok{ false };
-      const std::shared_ptr<T> cast_result = anySharedPtr->template cast<T>(is_cast_ok);
+      const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
       if (is_cast_ok) {
         result = cast_result;
       }
@@ -282,7 +282,7 @@ namespace xxx {
     std::pair<std::shared_ptr<T>,bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
     {
       bool is_cast_ok{ false };
-      const std::shared_ptr<T> cast_result = anySharedPtr->template cast<T>(is_cast_ok);
+      const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
       return std::make_pair(cast_result, is_cast_ok);
     }
 
