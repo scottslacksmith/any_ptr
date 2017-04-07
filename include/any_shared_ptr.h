@@ -288,6 +288,16 @@ namespace xxx {
 
 #endif
 
+    // Constructs an any object containing an object of type shared_ptr<T>, 
+    // passing the provided arguments to std::make_shared<T>.
+    // Is equivalent to 
+    //    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) }
+    template<class T, class... Args>
+    inline   any_shared_ptr make_any_shared_ptr(Args&&... args)
+    {
+      return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) };
+    }
+
   } // namespace ver_1
 
 
@@ -465,25 +475,29 @@ namespace xxx {
 
 #endif
 
+    // Constructs an any object containing an object of type shared_ptr<T>, 
+    // passing the provided arguments to std::make_shared<T>.
+    // Is equivalent to 
+    //    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) }
+    template<class T, class... Args>
+    inline   any_shared_ptr make_any_shared_ptr(Args&&... args)
+    {
+      return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) };
+    }
+
   } // namespace ver_2
-
-
-  // Constructs an any object containing an object of type shared_ptr<T>, 
-  // passing the provided arguments to std::make_shared<T>.
-  // Is equivalent to 
-  //    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) }
-  template<class T, class... Args>
-  inline   any_shared_ptr make_any_shared_ptr(Args&&... args)
-  {
-    return any_shared_ptr{ std::make_shared<T>(std::forward<Args>(args)...) };
-  }
 
 } // namespace xxx {
 
 
 namespace std {
 
-  inline void swap(xxx::any_shared_ptr & lhs, xxx::any_shared_ptr & rhs)
+  inline void swap(xxx::ver_1::any_shared_ptr & lhs, xxx::ver_1::any_shared_ptr & rhs)
+  {
+    lhs.swap(rhs);
+  }
+
+  inline void swap(xxx::ver_2::any_shared_ptr & lhs, xxx::ver_2::any_shared_ptr & rhs)
   {
     lhs.swap(rhs);
   }

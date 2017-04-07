@@ -9,7 +9,7 @@ int main(int argc, char ** const argv)
   std::cout << "sizeof(any_ptr)       = " << sizeof(xxx::any_ptr) << '\n';
   std::cout << "*** any_shared_ptr ****" << '\n';
   std::cout << "sizeof(std::shared_ptr<int>) = " << sizeof(std::shared_ptr<int>) << '\n';
-  std::cout << "sizeof(any_shared_ptr)       = " << sizeof(xxx::any_shared_ptr) << '\n';
+  std::cout << "sizeof(ver_1::any_shared_ptr)       = " << sizeof(xxx::ver_1::any_shared_ptr) << '\n';
   std::cout << "sizeof(ver_2::any_shared_ptr)       = " << sizeof(xxx::ver_2::any_shared_ptr) << '\n';
   std::cout << std::endl;
 
