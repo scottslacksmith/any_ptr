@@ -312,10 +312,10 @@ namespace xxx {
       //-----------------------------------------------------
       // ctors
 
+      any_shared_ptr() noexcept = default;
+
       template<typename T>
       any_shared_ptr(std::shared_ptr<T> ptr) noexcept;
-
-      any_shared_ptr() noexcept;
 
       //-----------------------------------------------------
       // Modifiers
@@ -362,7 +362,7 @@ namespace xxx {
 
       // The typeid(shared_ptr<T*) of the held shared_ptr, 
       // otherwise set to typeid(void) to indicate an empty state.
-      const std::type_info *  my_type_info{ nullptr };
+      const std::type_info *  my_type_info{ & typeid(void) };
       // The held shared_ptr, 
       std::shared_ptr<void>   my_shared_ptr{ nullptr };
       // The throw function that implements a dynamic up cast
@@ -383,11 +383,6 @@ namespace xxx {
 
     //-----------------------------------------------------------------------------------------------------
     // Implementation
-
-    inline any_shared_ptr::any_shared_ptr() noexcept
-      : my_type_info{ & typeid(void) }
-    {
-    }
 
     template<typename T>
     any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
