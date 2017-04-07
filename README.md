@@ -40,13 +40,13 @@ using namespace std;
 any_share_ptr any{ ptr };
 
 // OK  - casting to the same cv-qualified type
-shared_ptr<Derived> derived = any_shared_ptr_cast< shared_ptr<Derived> >( any );  
+shared_ptr<Derived> derived = any_shared_ptr_cast< Derived >( any );  
 
 // OK - implicit cv-qualifier promotion is supported
-shared_ptr<const Derived> const_derived = any_shared_ptr_cast< shared_ptr<const Derived> >( any );  
+shared_ptr<const Derived> const_derived = any_shared_ptr_cast< const Derived >( any );  
 
 // OK - implicit upcast is supported
-shared_ptr<Base> base = any_shared_ptr_cast< std::shared_ptr<Base> >( any );  
+shared_ptr<Base> base = any_shared_ptr_cast< Base >( any );  
 ```
 and ```any_ptr```.
 ```
