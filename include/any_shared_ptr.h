@@ -358,17 +358,11 @@ namespace xxx {
       template<typename T>
       using HeldType = std::shared_ptr<T>;
 
-
       template <typename T>
       std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept;
 
-      template<typename T>
-      static void throw_func(void * ptr)
-      {
-        throw static_cast<T*>(ptr);
-      }
-
-      using Operation_func =  void(void *);
+      // Make alias for signature for throw function  
+      using Throw_func =  void(void *);
 
       // The typeid(shared_ptr<T*) of the held shared_ptr, 
       // otherwise set to typeid(void) to indicate an empty state.
@@ -376,7 +370,14 @@ namespace xxx {
       // The held shared_ptr, 
       std::shared_ptr<void>   my_shared_ptr{ nullptr };
       // The throw function that implements a dynamic up cast
-      Operation_func *        my_throw_func{ nullptr };
+      Throw_func *            my_throw_func{ nullptr };
+
+      // Throw exception to implement implicit up cast 
+      template<typename T>
+      static void throw_func(void * ptr)
+      {
+        throw static_cast<T*>(ptr);
+      }
 
       template<typename T>
       friend std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr);
@@ -397,7 +398,7 @@ namespace xxx {
     template<typename T>
     any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
       : my_type_info{ & typeid(HeldType<T>) }
-      , my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(ptr) }
+      , my_shared_ptr{ std::const_pointer_cast<HeldBaseUnqualifiedType<T>>(std::move(ptr)) }
       , my_throw_func{ & any_shared_ptr::throw_func<HeldBaseType<T>> }
     {
     }
