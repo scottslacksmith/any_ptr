@@ -46,11 +46,11 @@ namespace xxx {
         Derived * p = ptr.get();
 
         std::any a1{ p };
-        std::any_cast<Derived*>( a1 ); // cast succeeds
-        std::any_cast<Base*>( a1 ); // cast fails as there's no implicit up cast
+        std::any_cast<Derived>( a1 ); // cast succeeds
+        std::any_cast<Base>( a1 ); // cast fails as there's no implicit up cast
 
         xxx::any_ptr a2{ p };
-        xxx::any_ptr_cast<Base*>( a1 ); // implicit up cast succeeds
+        xxx::any_ptr_cast<Base>( a2 ); // implicit up cast succeeds
     */
     class any_ptr
     {
@@ -108,7 +108,7 @@ namespace xxx {
 
       // The typeid(T*) of the held pointer, 
       // otherwise set to typeid(void) to indicate an empty state.
-      const std::type_info *  my_type_info{ &typeid(void) };
+      const std::type_info *  my_type_info{ & typeid(void) };
       // The held pointer
       void*                   my_ptr{ nullptr };
       // The throw function that implements a dynamic up cast
