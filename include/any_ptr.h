@@ -3,7 +3,10 @@
 #include <typeinfo>
 #include <type_traits>
 #ifdef _MSC_VER
-  #include <optional>
+  #if _HAS_CXX17 != 0
+    #include <optional>
+    #define ANY_PTR_HAS_LIB_OPTIONAL 
+  #endif
 #else
   #if __has_include(<optional>) // requires GCC 5 or greater
     #include <optional>
@@ -175,8 +178,11 @@ namespace xxx {
 
     //-----------------------------------------------------------------------------------------------------
 
+
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL
+
     template<typename T>
-    std::optional<T*> any_ptr_cast(any_ptr const * any_ptr_) noexcept
+    std::optional<T*> any_ptr_cast(const any_ptr * any_ptr_) noexcept
     {
       std::optional<T*> result;
       const std::pair<T*, bool> cast_result = any_ptr_->template dynamic_up_cast<T>();
@@ -185,6 +191,16 @@ namespace xxx {
       }
       return result;
     }
+
+#else // replace std::optional<T*> with std::pair<T*, bool>
+
+    template<typename T>
+    std::pair<T*, bool> any_ptr_cast(const any_ptr * any_ptr_) noexcept
+    {
+      return any_ptr_->template dynamic_up_cast<T>();
+    }
+
+#endif
 
     template<typename T>
     T* any_ptr_cast(any_ptr const & any_ptr_)
@@ -210,7 +226,10 @@ namespace std {
 
 } // namespace std
 
-
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL 
+#undef ANY_PTR_HAS_LIB_OPTIONAL 
 #endif
