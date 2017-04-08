@@ -187,8 +187,7 @@ namespace xxx {
 
     inline any_shared_ptr& any_shared_ptr::operator=(any_shared_ptr const& other) noexcept
     {
-      if (this != &other)
-      {
+      if (this != &other) {
         this->~any_shared_ptr();
         my_type_info = other.my_type_info;
         other.holder()->clone(&my_inplace_storage);
@@ -199,8 +198,7 @@ namespace xxx {
 
     inline any_shared_ptr& any_shared_ptr::operator=(any_shared_ptr && other) noexcept
     {
-      if (this != &other)
-      {
+      if (this != &other) {
         this->~any_shared_ptr();
         my_type_info = other.my_type_info;
         my_inplace_storage = other.my_inplace_storage;
