@@ -193,6 +193,7 @@ namespace xxx {
         my_type_info = other.my_type_info;
         other.holder()->clone(&my_inplace_storage);
       }
+      // else self-copy - do nothing
       return *this;
     }
 
@@ -205,6 +206,7 @@ namespace xxx {
         my_inplace_storage = other.my_inplace_storage;
         other.reset();
       }
+      // else self-move - do nothing
       return *this;
     }
 
