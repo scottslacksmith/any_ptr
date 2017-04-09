@@ -126,8 +126,17 @@ namespace xxx {
         throw static_cast<T*>(ptr);
       }
 
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL
+
       template<typename T>
       friend std::optional<T*> any_ptr_cast(any_ptr const * any_ptr_) noexcept;
+
+#else // replace std::optional<T*> with std::pair<T*, bool>
+
+      template<typename T>
+      std::pair<T*, bool> any_ptr_cast(const any_ptr * any_ptr_) noexcept;
+
+#endif
 
       template<typename T>
       friend T* any_ptr_cast(any_ptr const & any_ptr_);

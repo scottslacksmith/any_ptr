@@ -2,7 +2,9 @@
 #include <sstream>
 #include <memory>
 #ifdef _MSC_VER
-  #include <any>
+  #if _HAS_CXX17 != 0
+    #include <any>
+  #endif
 #else
   #if __has_include(<any>) // requires GCC 5 or greater
     #include <any>
@@ -14,6 +16,8 @@
     } // namespace std
   #endif
 #endif
+
+#if !defined(_MSC_VER) || _HAS_CXX17 != 0
 
 namespace  {
 
@@ -120,3 +124,5 @@ static void BM_any_cast_with_shared_ptr(benchmark::State& state) {
 }
 
 BENCHMARK_WITH_NAME("std::any_cast<shared_ptr<int>> - OK", BM_any_cast_with_shared_ptr);
+
+#endif

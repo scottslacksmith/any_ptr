@@ -125,11 +125,11 @@ Using Google's microbenchmark library (see the src/benchmark folder) we observe 
 ||Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
 |-|-|-|-|-|
 |**any_shared_ptr**|||||
-|any_shared_ptr_cast< Derived >( any )|Cast to same type|27 ns|15 ns|15 ns|
-|any_shared_ptr_cast< Base >( any )|Up cast|2232 ns|2040 ns|2086 ns|
+|any_shared_ptr_cast< Derived >( any )|Cast to same type|27 ns|15 ns|16 ns|
+|any_shared_ptr_cast< Base >( any )|Up cast|2232 ns|2040 ns|2050 ns|
 |**any_ptr**|||||
 |any_ptr_cast< Derived >( any )|Cast to same type|5 ns|2 ns|2 ns|
-|any_ptr_cast< Base >( any )|Up cast|2200 ns|1950 ns|1950 ns|
+|any_ptr_cast< Base >( any )|Up cast|2200 ns|1950 ns|2080 ns|
 |
 
 The processor used for benchmark was an Intel i7-4710HQ 2.3GHz 
@@ -154,8 +154,8 @@ cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true -DCMAKE_CXX_COMPILE
 
 The following minimum versions are strongly recommended to build the library:  
 * GCC 5  
-* Clang 4  
-* Visual Studio 2017  
+* Clang 3.9  
+* Visual Studio 2015  
 
 Anything older may work.
 
