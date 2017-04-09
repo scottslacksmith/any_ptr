@@ -67,7 +67,7 @@ Base* base = any_ptr_cast< Base >( any );
 ```
 Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or implicit up cast behaviour. This is not a ```std::any``` defect. Its primary purpose is to store *objects* and not *references* to an object. In contrast ```any_ptr```/```any_shared_ptr``` are designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a catch if performance is critical.
 ## What's the catch
-To implement ```any_ptr```/```any_shared_ptr``` we need a new function, let's call it dynamic_up_cast, that's similar to C++'s dynamic_cast except that it only performs an up cast. We could try implementing dynamic_up_cast by accessing the compilers internal RTTI data structures in a similar manner as dynamic_cast. However each compiler/platform combination could possibly require its own implementation which is not very appealing. Instead a better solution is a portable implementation that needs nothing more the C++ standard. The inspiration we need is Cassio Neri's observation [[1]](#references) that throwing and catching an exception can be use to implement an up cast as shown in the following code snippet.    
+To implement ```any_ptr```/```any_shared_ptr``` we need a new function, let's call it dynamic_up_cast, that's similar to C++'s dynamic_cast except that it only performs an up cast. We could try implementing dynamic_up_cast by accessing the compilers internal RTTI data structures in a similar manner as dynamic_cast. However many compiler/platform combinations would require its own implementation which is not very appealing. Instead a better solution is a portable implementation that needs nothing more the C++ standard. The inspiration we need is Cassio Neri's observation [[1]](#references) that throwing and catching an exception can be use to implement an up cast as shown in the following code snippet.    
 
 ```
 struct any_ptr
@@ -122,10 +122,14 @@ C++ exceptions are intended to used as an error reporting mechanism and thus the
 
 Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit upcast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
 
-|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
-|-|-|-|-|
-|Cast|24 ns|15 ns|15 ns|
-|Implicit up cast|2250 ns|2040 ns|2086 ns|
+||Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
+|-|-|-|-|-|
+|**any_shared_ptr**|||||
+|any_shared_ptr_cast< Derived >( any )|Cast to same type|27 ns|15 ns|15 ns|
+|any_shared_ptr_cast< Base >( any )|Up cast|2232 ns|2040 ns|2086 ns|
+|**any_ptr**|||||
+|any_ptr_cast< Derived >( any )|Cast to same type|5 ns|2 ns|2 ns|
+|any_ptr_cast< Base >( any )|Up cast|2200 ns|1950 ns|1950 ns|
 |
 
 The processor used for benchmark was an Intel i7-4710HQ 2.3GHz 
@@ -154,88 +158,6 @@ The following minimum versions are strongly recommended to build the library:
 * Visual Studio 2017  
 
 Anything older may work.
-
-## Alterntive implementations
-Consider the following possible implementation for ```any_ptr```
-```
-struct any_ptr
-{
-  template<typename T>
-  any_ptr::any_ptr(T* ptr) noexcept
-    : my_type_info{ & typeid(T*) }
-    , my_ptr{ const_cast<T*> (ptr) }
-  {
-  }
-
-  std::type_info &  type() const { return *my_type_info; }
-
-  void*                   my_ptr;
-  const std::type_info *  my_type_info;
-
-  template<typename T>
-  friend T* any_ptr_cast(any_ptr const & a);
-};
-
-template<typename T>
-T* any_ptr_cast(any_ptr const & a)
-{
-  if (a.type() == typeid(T*)) {
-    return static_cast<T*>(a.my_ptr);
-  }
-  else {   
-    // *** try cv-promotion and/or up cast ***
-    dynamic_up_cast<T*>(a.my_ptr);
-  }
-  throw std::bad_cast();
-}
-```
-What we need is a function, let's call it dynamic_up_cast, that's similar to C++'s dynamic_cast except that it only performs an up cast. However there's a problem. To use use dynamic_cast we must know the **to** and **from** type at compile time. In contrast, ```any_ptr_cast``` doesn't see the **from** type, though we know its std::info_type. In which case the following may work.
-
-```
-    // *** try cv-promotion and/or up cast ***
-    dynamic_up_cast<T*>(a.my_ptr,a.type());
-```
-However there's another potential problem which may only affect MSVC. Using MSVC's internal __RTDynamicCast as a guide then it's apparent that dynamc_up_cast must see the complete declaration for the my_type_info. 
-
-```
-struct any_ptr
-{
-  template<typename T>
-  any_ptr::any_ptr(T* ptr) noexcept
-    : my_dynamic_up_func( & any_ptr::dynamic_up_cast<T> )
-    , my_type_info{ & typeid(T*) }
-    , my_ptr{ const_cast<T*> (ptr) }
-  {
-  }
-
-  ... 
-
-  using Dynamic_up_cast_func = void*(const std::type_info& );
-
-  Dynamic_up_cast_func *  my_dynamic_up_func;
-
-  template<typename T>
-  static void * dynamic_up_cast(void * ptr, const std::type_info& to_type_info)
-  {
-    T* p = static_cast<T*>(ptr);
-    return __RTDynamicCast(p,0,typeid(T),to_type_info);
-  }
-};
-
-template<typename T>
-T* any_ptr_cast(any_ptr const & a)
-{
-  if (a.type() == typeid(T*)) {
-    return static_cast<T*>(a.my_ptr);
-  }
-  else {   
-    // *** try cv-promotion and/or up cast ***
-    const std::info_type & to_type_info = typeid(T*);
-    return static_cast<T*>(a.dynamic_up_cast(a.my_ptr,to_type_info));
-  }
-  throw std::bad_cast();
-}
-```
 
 ## References
 
