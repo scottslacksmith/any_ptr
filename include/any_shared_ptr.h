@@ -193,18 +193,20 @@ namespace xxx {
         my_type_info = other.my_type_info;
         other.holder()->clone(&my_inplace_storage);
       }
+      // else a self-copy - do nothing
       return *this;
     }
 
     inline any_shared_ptr& any_shared_ptr::operator=(any_shared_ptr && other) noexcept
     {
-      if (this != &other)
+      if (this != &other) 
       {
         this->~any_shared_ptr();
         my_type_info = other.my_type_info;
         my_inplace_storage = other.my_inplace_storage;
         other.reset();
       }
+      // else a self-move - do nothing
       return *this;
     }
 
