@@ -34,6 +34,21 @@ TEST(any_shared_ptr, basic_cast)
   ASSERT_EQ(p1.get(), any_shared_ptr_cast<int>(any2).get());
 }
 
+TEST(any_shared_ptr, void_nullptr)
+{
+  // Check that any_shared_ptr can hold shared_ptr<void> 
+  std::shared_ptr<void> ptr;
+  any_shared_ptr any{ ptr };
+
+  ASSERT_TRUE(any.has_value());
+  // Check the held type
+  ASSERT_EQ(any.type(), typeid(shared_ptr<void>));
+  // Test casting to the held type
+  shared_ptr<void> p1 = any_shared_ptr_cast<void>(any);
+  ASSERT_EQ(p1, nullptr);
+  EXPECT_THROW(any_shared_ptr_cast<int>(any), bad_any_shared_ptr_cast);
+}
+
 TEST(any_shared_ptr, cv_promotion_violations)
 {
   // Test casting from 'const' to 'non-const' fails

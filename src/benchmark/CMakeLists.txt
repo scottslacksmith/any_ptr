@@ -9,7 +9,7 @@ if (DEFINED BENCHMARK_CXX_LINKER_FLAGS)
 endif()
 
 macro(compile_benchmark_test name)
-  add_executable(${name} "main.cpp" "benchmark_any.cpp" "benchmark_any_ptr.cpp" "benchmark_any_shared_ptr.cpp")
+  add_executable(${name} "main.cpp" "benchmark_any.cpp" "benchmark_any_ptr.cpp" "benchmark_any_shared_ptr.cpp" "benchmark_std_shared_ptr.cpp" "benchmark_ver_2_any_shared_ptr.cpp")
   target_link_libraries(${name} google_benchmark ${CMAKE_THREAD_LIBS_INIT})
 endmacro(compile_benchmark_test)
 

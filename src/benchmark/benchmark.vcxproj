@@ -126,6 +126,8 @@
     <ClCompile Include="benchmark_any_ptr.cpp" />
     <ClCompile Include="benchmark_any.cpp" />
     <ClCompile Include="benchmark_any_shared_ptr.cpp" />
+    <ClCompile Include="benchmark_std_shared_ptr.cpp" />
+    <ClCompile Include="benchmark_ver_2_any_shared_ptr.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

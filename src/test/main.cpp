@@ -1,7 +1,19 @@
-#include <crtdbg.h> 
+#include <any_ptr.h>
+#include <any_shared_ptr.h>
+#include <crtdbg.h>
+#include <iostream>
 
 int main(int argc, char ** const argv)
 {
+  std::cout << "*** any_ptr ****" << '\n';
+  std::cout << "sizeof(any_ptr)       = " << sizeof(xxx::any_ptr) << '\n';
+  std::cout << "*** any_shared_ptr ****" << '\n';
+  std::cout << "sizeof(std::shared_ptr<int>) = " << sizeof(std::shared_ptr<int>) << '\n';
+  std::cout << "sizeof(ver_1::any_shared_ptr)       = " << sizeof(xxx::ver_1::any_shared_ptr) << '\n';
+  std::cout << "sizeof(ver_2::any_shared_ptr)       = " << sizeof(xxx::ver_2::any_shared_ptr) << '\n';
+  std::cout << std::endl;
+
+
 #ifdef _MSC_VER
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
   // Redirect reported leaks to stderr 

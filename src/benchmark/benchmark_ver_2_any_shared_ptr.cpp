@@ -12,7 +12,7 @@ namespace {
   struct Derived : public Base {};
 
   shared_ptr<Derived> our_ptr = make_shared<Derived>();
-  any_shared_ptr our_any_shared_ptr(our_ptr);
+  ver_2::any_shared_ptr our_any_shared_ptr(our_ptr);
 
   bool any_ptr_cast() {
     return any_shared_ptr_cast<Derived>(our_any_shared_ptr) != nullptr;
@@ -39,7 +39,7 @@ static void BM_any_ptr_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_shared_ptr_cast<Derived> - OK",BM_any_ptr_cast);
+BENCHMARK_WITH_NAME("ver_2::any_shared_ptr_cast<Derived> - OK",BM_any_ptr_cast);
 
 //-----------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ static void BM_any_ptr_implicit_up_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_shared_ptr_cast<Base> - OK - implicit up cast",BM_any_ptr_implicit_up_cast);
+BENCHMARK_WITH_NAME("ver_2::any_shared_ptr_cast<Base> - OK - implicit up cast",BM_any_ptr_implicit_up_cast);
 
 //-----------------------------------------------------------------------------
 namespace {
@@ -85,6 +85,6 @@ static void BM_any_ptr_bad_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_shared_ptr_cast<int> - failure", BM_any_ptr_bad_cast);
+BENCHMARK_WITH_NAME("ver_2::any_shared_ptr_cast<int> - fail by throwing any_ptr_bad_cast", BM_any_ptr_bad_cast);
 
 //-----------------------------------------------------------------------------

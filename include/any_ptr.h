@@ -3,7 +3,10 @@
 #include <typeinfo>
 #include <type_traits>
 #ifdef _MSC_VER
-  #include <optional>
+  #if _HAS_CXX17 != 0
+    #include <optional>
+    #define ANY_PTR_HAS_LIB_OPTIONAL 
+  #endif
 #else
   #if __has_include(<optional>) // requires GCC 5 or greater
     #include <optional>
@@ -43,11 +46,11 @@ namespace xxx {
         Derived * p = ptr.get();
 
         std::any a1{ p };
-        std::any_cast<Derived*>( a1 ); // cast succeeds
-        std::any_cast<Base*>( a1 ); // cast fails as there's no implicit up cast
+        std::any_cast<Derived>( a1 ); // cast succeeds
+        std::any_cast<Base>( a1 ); // cast fails as there's no implicit up cast
 
         xxx::any_ptr a2{ p };
-        xxx::any_ptr_cast<Base*>( a1 ); // implicit up cast succeeds
+        xxx::any_ptr_cast<Base>( a2 ); // implicit up cast succeeds
     */
     class any_ptr
     {
@@ -103,13 +106,13 @@ namespace xxx {
 
       using Throw_func = void(void *);
 
+      // The typeid(T*) of the held pointer, 
+      // otherwise set to typeid(void) to indicate an empty state.
+      const std::type_info *  my_type_info{ & typeid(void) };
       // The held pointer
       void*                   my_ptr{ nullptr };
       // The throw function that implements a dynamic up cast
       Throw_func *            my_throw_func{ nullptr };
-      // The typeid(T*) of the held pointer, 
-      // otherwise set to typeid(void) to indicate an empty state.
-      const std::type_info *  my_type_info{ & typeid(void) };
 
       // Attempt a dynamic up cast to T to replicate an implicit up cast. 
       // If the cast is successful then return { ptr , true } where ptr is the casted pointer
@@ -123,8 +126,17 @@ namespace xxx {
         throw static_cast<T*>(ptr);
       }
 
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL
+
       template<typename T>
       friend std::optional<T*> any_ptr_cast(any_ptr const * any_ptr_) noexcept;
+
+#else // replace std::optional<T*> with std::pair<T*, bool>
+
+      template<typename T>
+      std::pair<T*, bool> any_ptr_cast(const any_ptr * any_ptr_) noexcept;
+
+#endif
 
       template<typename T>
       friend T* any_ptr_cast(any_ptr const & any_ptr_);
@@ -132,9 +144,9 @@ namespace xxx {
 
     template<typename T>
     any_ptr::any_ptr(T* ptr) noexcept
-      : my_ptr{ const_cast<HeldType<T>> (ptr) }
+      : my_type_info{ &typeid(HeldType<T>) }
+      , my_ptr{ const_cast<HeldType<T>> (ptr) }
       , my_throw_func{ &any_ptr::throw_function<HeldBaseType<T>> }
-      , my_type_info{ & typeid(HeldType<T>) }
     {
     }
 
@@ -175,8 +187,11 @@ namespace xxx {
 
     //-----------------------------------------------------------------------------------------------------
 
+
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL
+
     template<typename T>
-    std::optional<T*> any_ptr_cast(any_ptr const * any_ptr_) noexcept
+    std::optional<T*> any_ptr_cast(const any_ptr * any_ptr_) noexcept
     {
       std::optional<T*> result;
       const std::pair<T*, bool> cast_result = any_ptr_->template dynamic_up_cast<T>();
@@ -185,6 +200,16 @@ namespace xxx {
       }
       return result;
     }
+
+#else // replace std::optional<T*> with std::pair<T*, bool>
+
+    template<typename T>
+    std::pair<T*, bool> any_ptr_cast(const any_ptr * any_ptr_) noexcept
+    {
+      return any_ptr_->template dynamic_up_cast<T>();
+    }
+
+#endif
 
     template<typename T>
     T* any_ptr_cast(any_ptr const & any_ptr_)
@@ -210,7 +235,10 @@ namespace std {
 
 } // namespace std
 
-
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#ifdef ANY_PTR_HAS_LIB_OPTIONAL 
+#undef ANY_PTR_HAS_LIB_OPTIONAL 
 #endif
