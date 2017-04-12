@@ -68,7 +68,8 @@ namespace xxx {
       // return true if not empty
       bool has_value() const noexcept { return my_type_info != nullptr; }
 
-      // Return the T's type-info for the held by shared_ptr<T>
+      // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
+      // otherwise typeid(void).
       const std::type_info & type() const noexcept;
 
       // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
@@ -101,9 +102,7 @@ namespace xxx {
       template<typename T>
       struct Holder final : public IHolder
       {
-        Holder()
-          : my_ptr()
-        {}
+        Holder() = default;
 
         Holder(std::shared_ptr<T> ptr)
           : my_ptr(std::move(ptr))
@@ -127,6 +126,8 @@ namespace xxx {
 
       using storage_t = typename std::aligned_storage<sizeof(Holder<void>), std::alignment_of<Holder<void>>::value>::type;
 
+      // Holds typeid(shared_ptr<T*) if instance is not empty, 
+      // otherwise set to typeid(void) to indicate an empty state.
       const std::type_info *  my_type_info{ nullptr };
       // Inplace storage to hold Holder<T>
       storage_t               my_inplace_storage;
@@ -213,6 +214,8 @@ namespace xxx {
       other = std::exchange(*this, std::move(other));
     }
 
+    // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
+    // otherwise typeid(void).
     inline const std::type_info & any_shared_ptr::type() const noexcept
     {
       return my_type_info ? *my_type_info : typeid(void);
@@ -341,7 +344,8 @@ namespace xxx {
       // return true if not empty
       bool has_value() const noexcept { return my_throw_func != nullptr; }
 
-      // Return the T's type-info for the held by shared_ptr<T>
+      // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
+      // otherwise typeid(void).
       const std::type_info & type() const noexcept;
 
       // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
@@ -364,7 +368,7 @@ namespace xxx {
       // Make alias for signature for throw function  
       using Throw_func =  void(void *);
 
-      // The typeid(shared_ptr<T*) of the held shared_ptr, 
+      // Holds typeid(shared_ptr<T*) if instance is not empty, 
       // otherwise set to typeid(void) to indicate an empty state.
       const std::type_info *  my_type_info{ & typeid(void) };
       // The held shared_ptr, 
@@ -408,6 +412,8 @@ namespace xxx {
       other = std::exchange(*this, std::move(other));
     }
 
+    // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
+    // otherwise typeid(void).
     inline const std::type_info & any_shared_ptr::type() const noexcept
     {
       return * my_type_info;
@@ -422,15 +428,15 @@ namespace xxx {
           result = std::static_pointer_cast<T>(my_shared_ptr);
           cast_ok = true;
         }
-        else { // try an implicit up cast by throwing an exception
+        else { // try an up-cast by throwing an exception
           try {
             my_throw_func(my_shared_ptr.get());
           }
-          catch (T* p) { // implicit up cast succeeded
+          catch (T* p) { // up-cast succeeded
             result = std::shared_ptr<T>(my_shared_ptr, p);
             cast_ok = true;
           }
-          catch (...) { // up cast failed
+          catch (...) { // up-cast failed
           }
         }
       }

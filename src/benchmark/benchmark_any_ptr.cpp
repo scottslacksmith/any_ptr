@@ -36,7 +36,7 @@ static void BM_any_ptr_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_ptr_cast",BM_any_ptr_cast);
+BENCHMARK_WITH_NAME("any_ptr_cast< Derived >( any ) - same type",BM_any_ptr_cast);
 
 //-----------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ static void BM_any_ptr_implicit_up_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_ptr_cast - implicit up cast",BM_any_ptr_implicit_up_cast);
+BENCHMARK_WITH_NAME("any_ptr_cast< Base >( any ) - up cast",BM_any_ptr_implicit_up_cast);
 
 //-----------------------------------------------------------------------------
 namespace {
@@ -82,6 +82,6 @@ static void BM_any_ptr_bad_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("any_ptr_cast - failure", BM_any_ptr_bad_cast);
+BENCHMARK_WITH_NAME("any_ptr_cast< int >( any ) - bad cast", BM_any_ptr_bad_cast);
 
 //-----------------------------------------------------------------------------
