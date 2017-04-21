@@ -163,7 +163,8 @@ Using Google's microbenchmark library (see the src/benchmark folder) we observe 
 |**any_shared_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
 |-|-|-|-|-|
 |any_shared_ptr_cast< Derived >(any)|Cast to same type|27 ns|15 ns|16 ns|
-|any_shared_ptr_cast< Base >(any)|up-cast|2232 ns|2040 ns|2050 ns|
+|any_shared_ptr_cast< const Derived >(any)|Cv-qualifier promotion|2200 ns| ns| ns|
+|any_shared_ptr_cast< Base >(any)|up-cast|2350 ns|2040 ns|2050 ns|
 
 
 
@@ -222,7 +223,8 @@ Base* base = any_ptr_cast< Base >( any );
 |**any_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
 |-|-|-|-|-|
 |any_ptr_cast< Derived >(any)|Cast to same type|5 ns|2 ns|2 ns|
-|any_ptr_cast< Base >(any)|Up-cast|2200 ns|1950 ns|2080 ns|
+|any_ptr_cast< const Derived >(any)|Cv-qualifier promotion|2163 ns| ns| ns|
+|any_ptr_cast< Base >(any)|Up-cast|2250 ns|1950 ns|2080 ns|
 
 ## References
 
