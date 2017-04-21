@@ -37,10 +37,10 @@
     <ClCompile Include="benchmark_any_shared_ptr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="benchmark_ver_2_any_shared_ptr.cpp">
+    <ClCompile Include="benchmark_std_shared_ptr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="benchmark_std_shared_ptr.cpp">
+    <ClCompile Include="benchmark_v2_any_shared_ptr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

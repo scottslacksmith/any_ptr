@@ -99,9 +99,9 @@ Helper classes
   bad_any_shared_ptr_cast
 
 ```
-```any_shared_ptr``` tries to be as consistent as possible with ```std::any_ptr```. The notable exception is the noexcept version of ```any_shared_ptr_cast``` which returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for noexcept version of ```std::any_ptr_cast```. The reason is due to temporary ```any_shared_ptr``` returned by ```any_shared_ptr_cast``` that's necessary to handle an up-cast and thus it's not possible to return an address to existing object.
+```any_shared_ptr``` tries to be as consistent as possible with ```std::any_ptr```. The notable exception is the noexcept version of ```any_shared_ptr_cast``` which returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for ```std::any_ptr_cast```. The reason is due to temporary ```shared_ptr<T>``` returned by ```any_shared_ptr_cast``` that's necessary to handle an up-cast and thus it's not possible to return an address to existing object.
 ## What's the catch
-To implement ```any_shared_ptr``` we need a new function, let's call it dynamic_up_cast, that's similar to C++'s dynamic_cast except that it only performs an up-cast. We could try implementing dynamic_up_cast by accessing the compilers internal RTTI data structures in a similar manner as dynamic_cast. However many compiler/platform combinations would require its own implementation which is not very appealing. Instead a better solution is a portable implementation that needs nothing more the standard C++ that's supported by all compilers. The inspiration we need is Cassio Neri's observation [[1]](#references) that throwing and catching an exception can be use to implement an up-cast as shown in the following code snippet.    
+To implement ```any_shared_ptr``` we need a new function, let's call it dynamic_up_cast, that's similar to C++'s dynamic_cast except that it only performs an up-cast. We could try implementing dynamic_up_cast by accessing the compilers internal RTTI data structures in a similar manner as dynamic_cast. However many compiler/platform combinations would require its own implementation which is not very appealing. Instead a better solution is a portable implementation that needs nothing more than standard C++ that's supported by all compilers. The inspiration we need is Cassio Neri's observation [[1]](#references) that throwing and catching an exception can be use to implement an up-cast as shown in the following code snippet.    
 
 ```
 struct any_ptr
@@ -160,7 +160,7 @@ Using Google's microbenchmark library (see the src/benchmark folder) we observe 
 |-|-|-|-|-|
 |any_shared_ptr_cast< Derived >(any)|Cast to same type|27 ns|15 ns|16 ns|
 |any_shared_ptr_cast< Base >(any)|up-cast|2232 ns|2040 ns|2050 ns|
-|
+
 
 
 The processor used for benchmark was an Intel i7-4710HQ 2.3GHz 
@@ -219,7 +219,7 @@ Base* base = any_ptr_cast< Base >( any );
 |-|-|-|-|-|
 |any_ptr_cast< Derived >(any)|Cast to same type|5 ns|2 ns|2 ns|
 |any_ptr_cast< Base >(any)|Up-cast|2200 ns|1950 ns|2080 ns|
-|
+
 ## References
 
 [1] Cassio Neri, _Twisting the RTTI System for Safe Dynamic Casts of void* in C++_, [Dr Dobbs](http://www.drdobbs.com/cpp/twisting-the-rtti-system-for-safe-dynami/229401004), (2011).

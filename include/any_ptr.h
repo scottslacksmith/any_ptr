@@ -52,11 +52,11 @@ namespace xxx {
     virtual const char* what() const noexcept override { return "bad any_ptr cast"; }
   };
 
-  inline namespace ver_1 {
+  inline namespace v1 {
 
     /**
       The class any_ptr is type-safe container for pointers to any type 
-      that, unlike std::any, allows implicit up casting.
+      that, unlike std::any,  supports cv-qualifier promotion and dynamic up-cast.
       
       For example:
 
@@ -242,7 +242,7 @@ namespace xxx {
       throw bad_any_ptr_cast();
     }
 
-  } // namespace ver_1
+  } // namespace v2
 
 } // namespace xxx
 
