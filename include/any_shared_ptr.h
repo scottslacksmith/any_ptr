@@ -241,6 +241,16 @@ namespace xxx {
 
   namespace v2 {
 
+    /**
+    The class v2::any_shared_ptr is more performant implementation 
+    of v1::any_shared_ptr.
+
+    It's more performant because;
+      1. sizeof(v2::any_shared_ptr) < sizeof(v1::any_shared_ptr) by 1 pointer
+      2. the MSVC performance of casting to same type is marginally better
+         due to avoiding a share_ptr copy.    
+
+    */
     class any_shared_ptr
     {
     public:
@@ -264,7 +274,7 @@ namespace xxx {
       any_shared_ptr(any_shared_ptr && other) noexcept
       {
         my_inplace_storage = other.my_inplace_storage;
-        ::new (&other.my_inplace_storage) EmptyHolder();
+        ::new (&other) any_shared_ptr();
       }
 
       any_shared_ptr& operator=(any_shared_ptr && other) noexcept
@@ -272,7 +282,7 @@ namespace xxx {
         if (this != &other) {
           this->~any_shared_ptr();
           my_inplace_storage = other.my_inplace_storage;
-          ::new (&other.my_inplace_storage) EmptyHolder();
+          ::new (&other) any_shared_ptr();
         }
         // else a self-move - do nothing
         return *this;
@@ -296,7 +306,7 @@ namespace xxx {
       void reset() noexcept 
       { 
         this->~any_shared_ptr();
-        ::new (this) EmptyHolder();
+        ::new (this) any_shared_ptr();
       }
 
       //-----------------------------------------------------
