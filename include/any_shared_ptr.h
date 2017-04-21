@@ -375,6 +375,9 @@ namespace xxx {
 
       struct EmptyHolder final : public IHolder
       {
+        // Not used - is required so that sizeof(Holder<void>) == sizeof(EmptyHolder)
+        std::shared_ptr<void>  my_ptr;
+
         EmptyHolder() = default;
 
         bool                    has_value() const noexcept { return false; }
@@ -382,8 +385,11 @@ namespace xxx {
         bool                    unique() const noexcept final { return false; }
         const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) EmptyHolder(); }
         void                    throw_held_pointer() const final {}
-        std::shared_ptr<void>   make_shared_ptr_alias(void* ) const noexcept final { return std::shared_ptr<void>(); }
+        std::shared_ptr<void>   make_shared_ptr_alias(void* ) const noexcept final { return my_ptr; }
       };
+
+      static_assert(sizeof(Holder<void>) == sizeof(EmptyHolder), "It's not essential but sizeof(Holder<void>) == sizeof(EmptyHolder)"
+                                                                 " is better so that all bytes in my_inplace_storage are initialized");
 
       using storage_t = typename std::aligned_storage<sizeof(Holder<void>), std::alignment_of<Holder<void>>::value>::type;
 
