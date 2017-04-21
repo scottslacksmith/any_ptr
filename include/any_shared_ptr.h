@@ -70,8 +70,8 @@ namespace xxx {
       // *** xxx::any_shared_ptr ***
       {
         xxx::any_shared_ptr a{ make_shared<Derived>() };
-        xxx::any_shared_ptr_cast< Dervied       >( a ); // cast to same type succeeds
-        xxx::any_shared_ptr_cast< const Dervied >( a ); // cv-qualifier promotion succeeds
+        xxx::any_shared_ptr_cast< Derived       >( a ); // cast to same type succeeds
+        xxx::any_shared_ptr_cast< const Derived >( a ); // cv-qualifier promotion succeeds
         xxx::any_shared_ptr_cast< Base          >( a ); // dynamic up cast succeeds
       }
     */
@@ -247,97 +247,146 @@ namespace xxx {
       //-----------------------------------------------------
       // Canonical "Rule of 5" ctors/dtor and copy operators
 
-      ~any_shared_ptr();
+      ~any_shared_ptr() { holder()->~IHolder(); }
 
-      any_shared_ptr(any_shared_ptr const & other) noexcept;
+      any_shared_ptr(any_shared_ptr const & other) noexcept { other.holder()->clone(&my_inplace_storage); }
 
-      any_shared_ptr(any_shared_ptr && other) noexcept;
+      any_shared_ptr(any_shared_ptr && other) noexcept
+      {
+        my_inplace_storage = other.my_inplace_storage;
+        ::new (&other.my_inplace_storage) any_shared_ptr();
+      }
 
-      any_shared_ptr& operator=(any_shared_ptr const& other) noexcept;
+      any_shared_ptr& operator=(any_shared_ptr const& other) noexcept
+      {
+        if (this != &other) {
+          this->~any_shared_ptr();
+          other.holder()->clone(&my_inplace_storage);
+        }
+        // else a self-copy - do nothing
+        return *this;
+      }
 
-      any_shared_ptr& operator=(any_shared_ptr && other) noexcept;
+      any_shared_ptr& operator=(any_shared_ptr && other) noexcept
+      {
+        if (this != &other) {
+          this->~any_shared_ptr();
+          my_inplace_storage = other.my_inplace_storage;
+          ::new (&other.my_inplace_storage) any_shared_ptr();
+        }
+        // else a self-move - do nothing
+        return *this;
+      }
 
       //-----------------------------------------------------
       // ctors
 
-      template<typename T>
-      any_shared_ptr(std::shared_ptr<T> ptr) noexcept;
+      any_shared_ptr() noexcept { ::new (&my_inplace_storage) EmptyHolder(); }
 
-      any_shared_ptr() noexcept;
+      template<typename T>
+      any_shared_ptr(std::shared_ptr<T> ptr) noexcept { ::new (&my_inplace_storage) Holder<T>(std::move(ptr));  }
 
       //-----------------------------------------------------
       // Modifiers
 
       // swaps two any objects 
-      void swap(any_shared_ptr & other) noexcept;
+      void swap(any_shared_ptr & other) noexcept { other = std::exchange(*this, std::move(other)); }
 
       // reset to empty state 
-      void reset() noexcept { ::new (this) any_shared_ptr(); }
+      void reset() noexcept 
+      { 
+        this->~any_shared_ptr();
+        ::new (this) any_shared_ptr(); 
+      }
 
       //-----------------------------------------------------
       // Observers
 
       // return true if not empty
-      bool has_value() const noexcept { return my_type_info != nullptr; }
+      bool has_value() const noexcept { return holder()->has_value(); }
 
       // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
       // otherwise typeid(void).
-      const std::type_info & type() const noexcept;
+      const std::type_info & any_shared_ptr::type() const noexcept { return holder()->type(); }
 
       // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
-      bool  unique() const noexcept;
+      bool  unique() const noexcept { return holder()->unique(); }
 
     private:
 
       template<typename T>
       using HeldType = std::shared_ptr<T>;
 
-
       template <typename T>
-      std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept;
+      std::shared_ptr<T> dynamic_up_cast(bool & cast_ok) const noexcept
+      {
+        std::shared_ptr<T> result;
+        if (has_value()) {
+          const IHolder * pholder{ holder() };
+          if (type() == typeid(HeldType<T>)) {
+            // [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
+            result = static_cast<const Holder<T>*>(pholder)->my_ptr;
+            cast_ok = true;
+          }
+          else { // try an up cast by throwing an exception
+            try {
+              pholder->throw_held_pointer();
+            }
+            catch (T* p) { // implicit up cast succeeded
+              result = std::static_pointer_cast<T>(pholder->make_shared_ptr_alias(const_cast<std::remove_cv_t<T>*>(p)));
+              cast_ok = true;
+            }
+            catch (...) { // up cast failed
+            }
+          }
+        }
+        return result;
+      }
 
       // Base class for the class holds shared_ptr
       struct IHolder
       {
         virtual ~IHolder() = default;
 
+        virtual bool                    has_value() const noexcept = 0;
+        virtual const std::type_info&   type() const noexcept = 0;
         virtual bool                    unique() const noexcept = 0;
         virtual const IHolder *         clone(void* const inplaceMemory) const noexcept = 0;
         virtual void                    throw_held_pointer() const = 0;
         virtual std::shared_ptr<void>   make_shared_ptr_alias(void * ptr) const noexcept = 0;
       };
 
-
       template<typename T>
       struct Holder final : public IHolder
       {
-        Holder() = default;
-
-        Holder(std::shared_ptr<T> ptr)
-          : my_ptr(std::move(ptr))
-        {}
-
-        bool                    unique() const noexcept final { return my_ptr.unique(); }
-
-        const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) Holder(my_ptr); }
-
-        void                    throw_held_pointer() const final { throw my_ptr.get(); }
-
-        std::shared_ptr<void>   make_shared_ptr_alias(void* p) const noexcept final 
-        { 
-          return std::shared_ptr<void>(my_ptr, p);  
-        }
-
         // The held shared_ptr
         std::shared_ptr<T>  my_ptr;
 
+        Holder() = default;
+        Holder(std::shared_ptr<T> ptr) : my_ptr(std::move(ptr)) {}
+
+        bool                    has_value() const noexcept { return true; }
+        const std::type_info&   type() const noexcept { return typeid(HeldType<T>); }
+        bool                    unique() const noexcept final { return my_ptr.unique(); }
+        const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) Holder(my_ptr); }
+        void                    throw_held_pointer() const final { throw my_ptr.get(); }
+        std::shared_ptr<void>   make_shared_ptr_alias(void* p) const noexcept final { return std::shared_ptr<void>(my_ptr, p); }
+      };
+
+      struct EmptyHolder final : public IHolder
+      {
+        EmptyHolder() = default;
+
+        bool                    has_value() const noexcept { return false; }
+        const std::type_info&   type() const noexcept { return typeid(void); }
+        bool                    unique() const noexcept final { return false; }
+        const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) EmptyHolder(); }
+        void                    throw_held_pointer() const final {}
+        std::shared_ptr<void>   make_shared_ptr_alias(void* ) const noexcept final { return std::shared_ptr<void>(); }
       };
 
       using storage_t = typename std::aligned_storage<sizeof(Holder<void>), std::alignment_of<Holder<void>>::value>::type;
 
-      // Holds typeid(shared_ptr<T*) if instance is not empty, 
-      // otherwise set to typeid(void) to indicate an empty state.
-      const std::type_info *  my_type_info{ nullptr };
       // Inplace storage to hold Holder<T>
       storage_t               my_inplace_storage;
 
@@ -362,106 +411,6 @@ namespace xxx {
     };
 
     //-----------------------------------------------------------------------------------------------------
-    // Implementation
-
-    template<typename T>
-    any_shared_ptr::any_shared_ptr(std::shared_ptr<T> ptr) noexcept
-      : my_type_info( & typeid(HeldType<T>) )
-    {
-      ::new (&my_inplace_storage) Holder<T>(std::move(ptr));
-    }
-
-    // [[gsl::suppress(type.6)]] //  warning C26495 : Variable 'xxx::v2::any_shared_ptr::my_inplace_storage' is uninitialized.Always initialize a member variable. (type.6)
-    inline any_shared_ptr::any_shared_ptr() noexcept
-    {
-      ::new (&my_inplace_storage) Holder<void>();
-    }
-
-    inline any_shared_ptr::~any_shared_ptr()
-    {
-      holder()->~IHolder();
-    }
-
-    inline any_shared_ptr::any_shared_ptr(any_shared_ptr const & other) noexcept
-      : my_type_info( other.my_type_info )
-    {
-      other.holder()->clone(&my_inplace_storage);
-    }
-
-    inline any_shared_ptr::any_shared_ptr(any_shared_ptr && other) noexcept
-      : my_type_info(other.my_type_info)
-    {
-      my_inplace_storage = other.my_inplace_storage;
-      other.reset();
-    }
-
-    inline any_shared_ptr& any_shared_ptr::operator=(any_shared_ptr const& other) noexcept
-    {
-      if (this != &other) {
-        this->~any_shared_ptr();
-        my_type_info = other.my_type_info;
-        other.holder()->clone(&my_inplace_storage);
-      }
-      // else a self-copy - do nothing
-      return *this;
-    }
-
-    inline any_shared_ptr& any_shared_ptr::operator=(any_shared_ptr && other) noexcept
-    {
-      if (this != &other) {
-        this->~any_shared_ptr();
-        my_type_info = other.my_type_info;
-        my_inplace_storage = other.my_inplace_storage;
-        other.reset();
-      }
-      // else a self-move - do nothing
-      return *this;
-    }
-
-    inline void any_shared_ptr::swap(any_shared_ptr & other) noexcept
-    {
-      other = std::exchange(*this, std::move(other));
-    }
-
-    // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
-    // otherwise typeid(void).
-    inline const std::type_info & any_shared_ptr::type() const noexcept
-    {
-      return my_type_info ? *my_type_info : typeid(void);
-    }
-
-    inline bool  any_shared_ptr::unique() const noexcept
-    {
-      return holder()->unique();
-    }
-
-    template <typename T>
-    std::shared_ptr<T> any_shared_ptr::dynamic_up_cast(bool & cast_ok) const noexcept
-    {
-      std::shared_ptr<T> result;
-      if (has_value()) {
-        const IHolder * pholder{ holder() };
-        if (type() == typeid(HeldType<T>)) {
-          // [[gsl::suppress(type.2)]] // warning C26491: Don't use static_cast downcasts. A cast from a polymorphic type should use dynamic_cast. (type.2)
-          result = static_cast<const Holder<T>*>(pholder)->my_ptr;
-          cast_ok = true;
-        }
-        else { // try an up cast by throwing an exception
-          try {
-            pholder->throw_held_pointer();
-          }
-          catch (T* p) { // implicit up cast succeeded
-            result = std::static_pointer_cast<T>(pholder->make_shared_ptr_alias(const_cast<std::remove_cv_t<T>*>(p)));
-            cast_ok = true;
-          }
-          catch (...) { // up cast failed
-          }
-        }
-      }
-      return result;
-    }
-
-    //-----------------------------------------------------------------------------------------------------
 
     template<typename T>
     std::shared_ptr<T> any_shared_ptr_cast(any_shared_ptr const & anySharedPtr)
@@ -475,7 +424,6 @@ namespace xxx {
     }
 
 #ifdef ANY_SHARED_PTR_HAS_LIB_OPTIONAL
-
     template<typename T>
     std::optional<std::shared_ptr<T>> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
     {
@@ -487,9 +435,7 @@ namespace xxx {
       }
       return result;
     }
-
 #else // replace std::optional<std::shared_ptr<T>> with std::pair<std::shared_ptr<T>,bool>
-
     template<typename T>
     std::pair<std::shared_ptr<T>,bool> any_shared_ptr_cast(any_shared_ptr const * anySharedPtr) noexcept
     {
@@ -497,7 +443,6 @@ namespace xxx {
       const std::shared_ptr<T> cast_result = anySharedPtr->template dynamic_up_cast<T>(is_cast_ok);
       return std::make_pair(cast_result, std::move(is_cast_ok));
     }
-
 #endif
 
     // Constructs an any object containing an object of type shared_ptr<T>, 
@@ -517,12 +462,12 @@ namespace xxx {
 
 namespace std {
 
-  inline void swap(xxx::v2::any_shared_ptr & lhs, xxx::v2::any_shared_ptr & rhs)
+  inline void swap(xxx::v1::any_shared_ptr & lhs, xxx::v1::any_shared_ptr & rhs)
   {
     lhs.swap(rhs);
   }
 
-  inline void swap(xxx::v1::any_shared_ptr & lhs, xxx::v1::any_shared_ptr & rhs)
+  inline void swap(xxx::v2::any_shared_ptr & lhs, xxx::v2::any_shared_ptr & rhs)
   {
     lhs.swap(rhs);
   }

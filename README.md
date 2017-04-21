@@ -76,6 +76,10 @@ Many causal users of ```std::any``` may be surprised to find that ```std::any```
 
       // returns typeid(std::shared_ptr<T>) of the contained value
       const std::info_type & type() const; 
+    
+      // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
+      bool  unique() const;
+
   };
 
 // --- Non-member functions ---
