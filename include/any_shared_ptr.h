@@ -317,7 +317,7 @@ namespace xxx {
 
       // Returns typeid(std::shared_ptr<T>) if instance is non-empty,
       // otherwise typeid(void).
-      const std::type_info & any_shared_ptr::type() const noexcept { return holder()->type(); }
+      const std::type_info & type() const noexcept { return holder()->type(); }
 
       // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
       bool  unique() const noexcept { return holder()->unique(); }
