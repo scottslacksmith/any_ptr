@@ -251,12 +251,6 @@ namespace xxx {
 
       any_shared_ptr(any_shared_ptr const & other) noexcept { other.holder()->clone(&my_inplace_storage); }
 
-      any_shared_ptr(any_shared_ptr && other) noexcept
-      {
-        my_inplace_storage = other.my_inplace_storage;
-        ::new (&other.my_inplace_storage) any_shared_ptr();
-      }
-
       any_shared_ptr& operator=(any_shared_ptr const& other) noexcept
       {
         if (this != &other) {
@@ -267,12 +261,18 @@ namespace xxx {
         return *this;
       }
 
+      any_shared_ptr(any_shared_ptr && other) noexcept
+      {
+        my_inplace_storage = other.my_inplace_storage;
+        ::new (&other.my_inplace_storage) EmptyHolder();
+      }
+
       any_shared_ptr& operator=(any_shared_ptr && other) noexcept
       {
         if (this != &other) {
           this->~any_shared_ptr();
           my_inplace_storage = other.my_inplace_storage;
-          ::new (&other.my_inplace_storage) any_shared_ptr();
+          ::new (&other.my_inplace_storage) EmptyHolder();
         }
         // else a self-move - do nothing
         return *this;
@@ -296,7 +296,7 @@ namespace xxx {
       void reset() noexcept 
       { 
         this->~any_shared_ptr();
-        ::new (this) any_shared_ptr(); 
+        ::new (this) EmptyHolder();
       }
 
       //-----------------------------------------------------
