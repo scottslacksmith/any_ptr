@@ -36,6 +36,10 @@ namespace {
     return xxx::any_ptr_cast<Derived>(our_any_ptr) != nullptr;
   }
 
+  bool any_ptr_cast_cv_promotion() {
+    return xxx::any_ptr_cast<const Derived>(our_any_ptr) != nullptr;
+  }
+
   bool any_ptr_implicit_up_cast() {
     return xxx::any_ptr_cast<Base>(our_any_ptr) != nullptr;
   }
@@ -58,6 +62,23 @@ static void BM_any_ptr_cast(benchmark::State& state) {
 }
 
 BENCHMARK_WITH_NAME("any_ptr_cast< Derived >( any ) - same type",BM_any_ptr_cast);
+
+//-----------------------------------------------------------------------------
+
+static void BM_any_ptr_cast_cv_promotion(benchmark::State& state) {
+  bool result{ false };
+  while (state.KeepRunning()) {
+    result = any_ptr_cast_cv_promotion();
+    assert(result);
+  }
+
+  // Prevent compiler optimizations
+  std::stringstream ss;
+  ss << result;
+  state.SetLabel(ss.str());
+}
+
+BENCHMARK_WITH_NAME("any_ptr_cast< const Derived >( any ) - cv-qualifier promotion", BM_any_ptr_cast_cv_promotion);
 
 //-----------------------------------------------------------------------------
 

@@ -159,10 +159,12 @@ C++ exceptions are intended to used as an error reporting mechanism and thus the
 
 Using Google's microbenchmark library (see the src/benchmark folder) we observe that the implicit up-cast is ~100x slower than the basic cast to the same type held by ```any_shared_ptr```.
 
-|**any_shared_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
+|**any_shared_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.8|
 |-|-|-|-|-|
-|any_shared_ptr_cast< Derived >(any)|Cast to same type|27 ns|15 ns|16 ns|
-|any_shared_ptr_cast< Base >(any)|up-cast|2232 ns|2040 ns|2050 ns|
+|any_shared_ptr_cast< Derived >(any)|Cast to same type|27 ns|14 ns|14 ns|
+|any_shared_ptr_cast< const Derived >(any)|Cv-qualifier promotion|2151 ns|2014 ns|2052 ns|
+|any_shared_ptr_cast< Base >(any)|up-cast|2318 ns|2048 ns|2092 ns|
+|any_shared_ptr_cast< int >(any)|Bad cast|4551 ns|3608 ns|5147 ns|
 
 
 
@@ -218,10 +220,12 @@ const Derived* const_derived = any_ptr_cast< const Derived >( any );
 Base* base = any_ptr_cast< Base >( any );  
 ```
 ## Benchmarks
-|**any_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.9|
+|**any_ptr**|Benchmark (x64) |MSVC 2017|GCC 6.2|Clang 3.8|
 |-|-|-|-|-|
 |any_ptr_cast< Derived >(any)|Cast to same type|5 ns|2 ns|2 ns|
-|any_ptr_cast< Base >(any)|Up-cast|2200 ns|1950 ns|2080 ns|
+|any_ptr_cast< const Derived >(any)|Cv-qualifier promotion|2182 ns|1939 ns|2018 ns|
+|any_ptr_cast< Base >(any)|Up-cast|2230 ns|1964 ns|2089 ns|
+|any_ptr_cast< int >(any)|Bad cast|4441 ns|3688 ns|5102 ns|
 
 ## References
 

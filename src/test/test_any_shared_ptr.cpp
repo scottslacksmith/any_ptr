@@ -137,7 +137,7 @@ TEST(any_shared_ptr, const_promotion)
   }
 }
 
-TEST(any_shared_ptr, VolatilePromotion)
+TEST(any_shared_ptr, volatile_promotion)
 {
   // Test non-volatile -> volatile & non-volatile cast
   {
