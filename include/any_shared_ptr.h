@@ -94,7 +94,7 @@ namespace xxx {
       //-----------------------------------------------------
       // ctors
 
-      any_shared_ptr() noexcept = default;
+      constexpr any_shared_ptr() noexcept = default;
 
       template<typename T>
       any_shared_ptr(std::shared_ptr<T> ptr) noexcept
@@ -123,8 +123,8 @@ namespace xxx {
       // otherwise typeid(void).
       const std::type_info & type() const noexcept { return *my_type_info; }
 
-      // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
-      bool  unique() const noexcept { return my_shared_ptr.unique(); }
+      // returns the number of shared_ptr objects referring to the same managed object 
+      bool  use_count() const noexcept { return my_shared_ptr.use_count(); }
 
     private:
 

@@ -78,8 +78,8 @@ bool has_value()  const;
 6. // returns typeid(std::shared_ptr<T>) of the contained value   
 const std::info_type & type() const;
 
-7. // return true if shared_ptr is unqiue   
-bool unique() const;
+7. // returns the number of shared_ptr objects referring to the same managed object    
+bool use_count() const;
 
 ### Non-member functions
 
