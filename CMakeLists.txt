@@ -1,5 +1,5 @@
-	 cmake_minimum_required (VERSION 2.8.11)
-project (benchmark)
+cmake_minimum_required (VERSION 2.8.11)
+project (any_ptr)
 
 foreach(p
     CMP0054 # CMake 3.1

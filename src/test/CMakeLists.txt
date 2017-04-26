@@ -8,11 +8,11 @@ if (DEFINED BENCHMARK_CXX_LINKER_FLAGS)
   list(APPEND CMAKE_EXE_LINKER_FLAGS ${BENCHMARK_CXX_LINKER_FLAGS})
 endif()
 
-add_executable(test_any_ptr "main.cpp" "test_any_shared_ptr.cpp")
-target_link_libraries(test_any_ptr gtest ${CMAKE_THREAD_LIBS_INIT})
+add_executable(any_ptr_test "main.cpp" "test_any_shared_ptr.cpp")
+target_link_libraries(any_ptr_test gtest ${CMAKE_THREAD_LIBS_INIT})
 
 # Demonstration executable
-add_test(test_any_ptr test_any_ptr --benchmark_min_time=0.01)
+add_test(any_ptr_test any_ptr_test)
 
 # Add the coverage command(s)
 if(CMAKE_BUILD_TYPE)
@@ -32,8 +32,8 @@ if (${CMAKE_BUILD_TYPE_LOWER} MATCHES "coverage")
       COMMAND ${LCOV} -q --no-external -c -b "${CMAKE_SOURCE_DIR}" -d . -o after.lcov
       COMMAND ${LCOV} -q -a before.lcov -a after.lcov --output-file final.lcov
       COMMAND ${LCOV} -q -r final.lcov "'${CMAKE_SOURCE_DIR}/test/*'" -o final.lcov
-      COMMAND ${GENHTML} final.lcov -o lcov --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" -t test_any_ptr
-      DEPENDS any_ptr_benchmark
+      COMMAND ${GENHTML} final.lcov -o lcov --demangle-cpp --sort -p "${CMAKE_BINARY_DIR}" -t any_ptr_test
+      DEPENDS any_ptr_test
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       COMMENT "Running LCOV"
     )
