@@ -171,8 +171,8 @@ include_directories(${PROJECT_SOURCE_DIR}thirdparty/google/test/1.8.0/googletest
 # Build the targets
 add_subdirectory(thirdparty/google/benchmark/1.1.0/src)
 add_subdirectory(src/benchmark)
-# add_subdirectory(thirdparty/google/test/1.8.0/googletest)
-# add_subdirectory(src/any_ptr_test)
+add_subdirectory(thirdparty/google/test/1.8.0/googletest)
+add_subdirectory(src/test)
 
 if (BENCHMARK_ENABLE_TESTING)
 endif()

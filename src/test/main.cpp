@@ -19,21 +19,23 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#include <gtest/gtest.h>
 #include <any_ptr.h>
 #include <any_shared_ptr.h>
-#include <crtdbg.h>
 #include <iostream>
+#ifdef _MSC_VER
+  #include <crtdbg.h>
+#endif
 
 int main(int argc, char ** const argv)
 {
   std::cout << "*** any_ptr ****" << '\n';
   std::cout << "sizeof(any_ptr)       = " << sizeof(xxx::any_ptr) << '\n';
   std::cout << "*** any_shared_ptr ****" << '\n';
-  std::cout << "sizeof(std::shared_ptr<int>) = " << sizeof(std::shared_ptr<int>) << '\n';
-  std::cout << "sizeof(v1::any_shared_ptr)       = " << sizeof(xxx::v1::any_shared_ptr) << '\n';
-  std::cout << "sizeof(v2::any_shared_ptr)       = " << sizeof(xxx::v2::any_shared_ptr) << '\n';
+  std::cout << "sizeof(std::shared_ptr<int>)  = " << sizeof(std::shared_ptr<int>) << '\n';
+  std::cout << "sizeof(v1::any_shared_ptr)    = " << sizeof(xxx::v1::any_shared_ptr) << '\n';
+  std::cout << "sizeof(v2::any_shared_ptr)    = " << sizeof(xxx::v2::any_shared_ptr) << '\n';
   std::cout << std::endl;
-
 
 #ifdef _MSC_VER
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
