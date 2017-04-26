@@ -39,20 +39,146 @@ TEST(any_shared_ptr, empty)
   EXPECT_THROW(any_shared_ptr_cast<int>(any), bad_any_shared_ptr_cast);
 }
 
-TEST(any_shared_ptr, basic_cast)
+TEST(any_shared_ptr, copy_ctor)
 {
-  auto p1 = make_shared<int>(42);
-  any_shared_ptr any1{ p1 };
+  any_shared_ptr any1{ std::make_shared<int>(42) };
 
-  any_shared_ptr any2{ any1 };
+  any_shared_ptr any{ any1 };
 
-  ASSERT_TRUE(any1.has_value());
+  ASSERT_EQ(any1.use_count(), 2);
+  ASSERT_EQ(any.use_count(), 2);
+
+  {
+    ASSERT_TRUE(any1.has_value());
+    // Check the held type
+    ASSERT_EQ(any1.type(), typeid(shared_ptr<int>));
+    // Test casting to the held type
+    shared_ptr<int> p1 = any_shared_ptr_cast<int>(any1);
+    ASSERT_EQ(*p1, 42);
+  }
+
+  {
+    ASSERT_TRUE(any.has_value());
+    // Check the held type
+    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+    // Test casting to the held type
+    shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+    ASSERT_EQ(*p1, 42);
+  }
+}
+
+TEST(any_shared_ptr, move_ctor)
+{
+  any_shared_ptr any1{ std::make_shared<int>(42) };
+
+  any_shared_ptr any{ std::move(any1) };
+
+  // verify moved from object is empty 
+  ASSERT_EQ(any1.use_count(),0);
+  
+  ASSERT_TRUE(any.has_value());
   // Check the held type
-  ASSERT_EQ(any1.type(), typeid(shared_ptr<int>));
+  ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
   // Test casting to the held type
-  shared_ptr<int> p2 = any_shared_ptr_cast<int>(any1);
-  ASSERT_EQ(p1.get(), p2.get());
-  ASSERT_EQ(p1.get(), any_shared_ptr_cast<int>(any2).get());
+  shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+  ASSERT_EQ(*p1, 42);
+}
+
+TEST(any_shared_ptr, copy_assignment)
+{
+  // Check move assignment to empty any_shared_ptr 
+  {
+    any_shared_ptr any1{ std::make_shared<int>(42) };
+
+    any_shared_ptr any;
+
+    any = any1;
+
+    {
+      ASSERT_TRUE(any1.has_value());
+      // Check the held type
+      ASSERT_EQ(any1.type(), typeid(shared_ptr<int>));
+      // Test casting to the held type
+      shared_ptr<int> p1 = any_shared_ptr_cast<int>(any1);
+      ASSERT_EQ(*p1, 42);
+    }
+    {
+      ASSERT_TRUE(any.has_value());
+      // Check the held type
+      ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+      // Test casting to the held type
+      shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+      ASSERT_EQ(*p1, 42);
+    }
+  }
+  {
+  // Check move assignment to non-empty any_shared_ptr 
+    any_shared_ptr any1{ std::make_shared<int>(42) };
+
+    any_shared_ptr any{ std::make_shared<int>(24) };
+
+    any = any1;
+
+    ASSERT_EQ(any1.use_count(), 2);
+    ASSERT_EQ(any.use_count(), 2);
+
+    {
+      ASSERT_TRUE(any1.has_value());
+      // Check the held type
+      ASSERT_EQ(any1.type(), typeid(shared_ptr<int>));
+      // Test casting to the held type
+      shared_ptr<int> p1 = any_shared_ptr_cast<int>(any1);
+      ASSERT_EQ(*p1, 42);
+    }
+    {
+      ASSERT_TRUE(any.has_value());
+      // Check the held type
+      ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+      // Test casting to the held type
+      shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+      ASSERT_EQ(*p1, 42);
+    }
+  }
+}
+
+TEST(any_shared_ptr, move_assignment)
+{
+  // Check move assignment to empty any_shared_ptr 
+  {
+    any_shared_ptr any1{ std::make_shared<int>(42) };
+
+    any_shared_ptr any;
+    
+    any = std::move(any1);
+
+    // verify moved from object is empty 
+    ASSERT_EQ(any1.use_count(), 0);
+
+    ASSERT_TRUE(any.has_value());
+    // Check the held type
+    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+    // Test casting to the held type
+    shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+    ASSERT_EQ(*p1, 42);
+  }
+  // Check move assignment to non-empty any_shared_ptr 
+  {
+    any_shared_ptr any1{ std::make_shared<int>(42) };
+
+    any_shared_ptr any{ std::make_shared<int>(24) };
+
+    any = std::move(any1);
+
+    // verify moved from object is empty 
+    ASSERT_EQ(any1.use_count(), 0);
+
+    ASSERT_TRUE(any.has_value());
+    // Check the held type
+    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+    // Test casting to the held type
+    shared_ptr<int> p1 = any_shared_ptr_cast<int>(any);
+    ASSERT_EQ(*p1, 42);
+  }
 }
 
 TEST(any_shared_ptr, void_nullptr)
@@ -68,6 +194,45 @@ TEST(any_shared_ptr, void_nullptr)
   shared_ptr<void> p1 = any_shared_ptr_cast<void>(any);
   ASSERT_EQ(p1, nullptr);
   EXPECT_THROW(any_shared_ptr_cast<int>(any), bad_any_shared_ptr_cast);
+}
+
+TEST(any_shared_ptr, make_any_shared_ptr)
+{
+  // Test 0 arguments
+  {
+    auto any = make_any_shared_ptr<int>();
+
+    ASSERT_TRUE(any.has_value());
+    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
+    auto ptr = any_shared_ptr_cast<int>(any);
+    ASSERT_EQ(*ptr, 0);
+  }
+  // Test with 2 arguments
+  {
+    auto any = make_any_shared_ptr<pair<int, string>>(42, "test");
+
+    ASSERT_TRUE(any.has_value());
+    ASSERT_EQ(any.type(), typeid(shared_ptr<pair<int, string>>));
+    auto ptr = any_shared_ptr_cast<pair<int, string>>(any);
+    ASSERT_EQ(ptr->first, 42);
+    ASSERT_EQ(ptr->second, "test");
+  }
+}
+
+TEST(any_shared_ptr, cast_to_same_type)
+{
+  auto p1 = make_shared<int>(42);
+  any_shared_ptr any1{ p1 };
+
+  any_shared_ptr any2{ any1 };
+
+  ASSERT_TRUE(any1.has_value());
+  // Check the held type
+  ASSERT_EQ(any1.type(), typeid(shared_ptr<int>));
+  // Test casting to the held type
+  shared_ptr<int> p2 = any_shared_ptr_cast<int>(any1);
+  ASSERT_EQ(p1.get(), p2.get());
+  ASSERT_EQ(p1.get(), any_shared_ptr_cast<int>(any2).get());
 }
 
 TEST(any_shared_ptr, cv_promotion_violations)
@@ -101,7 +266,6 @@ TEST(any_shared_ptr, cv_promotion_violations)
     EXPECT_THROW(any_shared_ptr_cast<volatile int>(any), bad_any_shared_ptr_cast);
   }
 }
-
 
 TEST(any_shared_ptr, const_promotion)
 {
@@ -164,28 +328,5 @@ TEST(any_shared_ptr, volatile_promotion)
     EXPECT_THROW(any_shared_ptr_cast<int>(anyPtr), bad_any_shared_ptr_cast);
     EXPECT_NO_THROW(any_shared_ptr_cast<int volatile>(anyPtr));
     ASSERT_EQ(ptr.get(), any_shared_ptr_cast<int volatile>(anyPtr).get());
-  }
-}
-
-TEST(any_shared_ptr, make_any_shared_ptr)
-{
-  // Test 0 arguments
-  {
-    auto any = make_any_shared_ptr<int>();
-
-    ASSERT_TRUE(any.has_value());
-    ASSERT_EQ(any.type(), typeid(shared_ptr<int>));
-    auto ptr = any_shared_ptr_cast<int>(any);
-    ASSERT_EQ(*ptr, 0);
-  }
-  // Test with 2 arguments
-  {
-    auto any = make_any_shared_ptr<pair<int, string>>(42,"test");
-
-    ASSERT_TRUE(any.has_value());
-    ASSERT_EQ(any.type(),typeid(shared_ptr<pair<int, string>>));
-    auto ptr = any_shared_ptr_cast<pair<int, string>>(any);
-    ASSERT_EQ(ptr->first, 42);
-    ASSERT_EQ(ptr->second, "test");
   }
 }
