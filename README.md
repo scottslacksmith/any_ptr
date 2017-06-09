@@ -57,7 +57,7 @@ Many causal users of ```std::any``` may be surprised to find that ```std::any```
 #### Constructors
 
 1. // set to empty state  
-any_share_ptr();
+constexpr any_share_ptr() noexcept;
     
 2. template\<typename T>  
 any_share_ptr(std::shared_ptr<T> ptr);
@@ -79,7 +79,7 @@ bool has_value()  const;
 const std::info_type & type() const;
 
 7. // returns the number of shared_ptr objects referring to the same managed object    
-bool use_count() const;
+bool use_count() const noexcept;
 
 ### Non-member functions
 
