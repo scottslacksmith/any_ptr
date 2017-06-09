@@ -74,7 +74,7 @@ static void any_cast(benchmark::State& state) {
 	state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("std::any_cast<Derived> - OK",any_cast);
+BENCHMARK_WITH_NAME("std::any_cast<Derived>(any) - OK",any_cast);
 
 
 //-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ static void bad_any_cast(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("std::any_cast<int> - fail by throwing std::bad_any_cast", bad_any_cast);
+BENCHMARK_WITH_NAME("std::any_cast<int>(any) - fail by throwing std::bad_any_cast", bad_any_cast);
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -144,6 +144,6 @@ static void BM_any_cast_with_shared_ptr(benchmark::State& state) {
   state.SetLabel(ss.str());
 }
 
-BENCHMARK_WITH_NAME("std::any_cast<shared_ptr<int>> - OK", BM_any_cast_with_shared_ptr);
+BENCHMARK_WITH_NAME("std::any_cast<shared_ptr<int>>(any) - OK", BM_any_cast_with_shared_ptr);
 
 #endif

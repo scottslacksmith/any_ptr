@@ -12,3 +12,12 @@
 /CMakeCache.txt
 /src/benchmark/Makefile
 /src/benchmark/benchmark
+/src/test/CMakeFiles
+/Testing/Temporary
+/thirdparty/google/test/1.8.0/googletest/CMakeFiles
+*.lcov
+/src/test/any_ptr_test
+/src/test/CMakeCache.txt
+/src/test/Makefile
+*.a
+/thirdparty/google/test/1.8.0/googletest/Makefile

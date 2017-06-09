@@ -124,7 +124,7 @@ namespace xxx {
       const std::type_info & type() const noexcept { return *my_type_info; }
 
       // returns the number of shared_ptr objects referring to the same managed object 
-      bool  use_count() const noexcept { return my_shared_ptr.use_count(); }
+      long  use_count() const noexcept { return my_shared_ptr.use_count(); }
 
     private:
 

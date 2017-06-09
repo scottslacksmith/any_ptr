@@ -75,7 +75,7 @@ namespace {
 static void BM_atomic_increment(benchmark::State& state) {
   bool result{ false };
   while (state.KeepRunning()) {
-    result = copy_shared_ptr();
+    result = atomic_increment();
     assert(result);
   }
 
