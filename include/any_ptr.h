@@ -96,16 +96,28 @@ namespace xxx {
       any_ptr() noexcept = default;
 
       template<typename T>
-      any_ptr(T* ptr) noexcept;
+      any_ptr(T* ptr) noexcept
+        : my_type_info{ &typeid(HeldType<T>) }
+        , my_ptr{ const_cast<HeldType<T>> (ptr) }
+        , my_throw_func{ &any_ptr::throw_function<HeldBaseType<T>> }
+      {
+      }
 
       //-----------------------------------------------------
       // Modifiers
 
       // Reset to empty state 
-      void reset() noexcept;
+      void reset() noexcept
+      {
+        // Use default ctor to reset to empty state
+        ::new (this) any_ptr();
+      }
 
       // Swaps two any objects
-      void swap(any_ptr & other) noexcept;
+      void swap(any_ptr & other) noexcept
+      {
+        other = std::exchange(*this, std::move(other));
+      }
 
       //-----------------------------------------------------
       // Observers
@@ -139,7 +151,27 @@ namespace xxx {
       // If the cast is successful then return { ptr , true } where ptr is the casted pointer
       // otherwise return { nullptr , false }.
       template <typename T>
-      std::pair<T*,bool> dynamic_up_cast() const noexcept;
+      std::pair<T*,bool> dynamic_up_cast() const noexcept
+      {
+        std::pair<T*, bool> result{ nullptr, false };
+        if (type() == typeid(HeldType<T>)) { // cast succeeded
+          result.first = static_cast<T*>(my_ptr);
+          result.second = true;
+        }
+        else if (has_value()) { // attempt a dynamic up cast by throwing an exception
+          try {
+            my_throw_func(const_cast<void*>(my_ptr));
+          }
+          catch (T* const ptr) { // up cast succeeded
+            result.first = ptr;
+            result.second = true;
+          }
+          catch (...) { // up cast failed
+          }
+        }
+        // else dynamic up cast failed
+        return result;
+      }
 
       template<typename T>
       static void throw_function(void * const ptr)
@@ -162,49 +194,6 @@ namespace xxx {
       template<typename T>
       friend T* any_ptr_cast(any_ptr const & any_ptr_);
     };
-
-    template<typename T>
-    any_ptr::any_ptr(T* ptr) noexcept
-      : my_type_info{ &typeid(HeldType<T>) }
-      , my_ptr{ const_cast<HeldType<T>> (ptr) }
-      , my_throw_func{ &any_ptr::throw_function<HeldBaseType<T>> }
-    {
-    }
-
-    // reset to empty state 
-    inline void any_ptr::reset() noexcept
-    {
-      // Use default ctor to reset to empty state
-      ::new (this) any_ptr();
-    }
-
-    void any_ptr::swap(any_ptr & other) noexcept
-    {
-      other = std::exchange(*this, std::move(other));
-    }
-
-    template <typename T>
-    std::pair<T*, bool> any_ptr::dynamic_up_cast() const noexcept
-    {
-      std::pair<T*, bool> result{ nullptr, false };
-      if (type() == typeid(HeldType<T>)) { // cast succeeded
-        result.first = static_cast<T*>(my_ptr);
-        result.second = true;
-      }
-      else if (has_value()) { // attempt a dynamic up cast by throwing an exception
-        try {
-          my_throw_func(const_cast<void*>(my_ptr));
-        }
-        catch (T* const ptr) { // up cast succeeded
-          result.first = ptr;
-          result.second = true;
-        }
-        catch (...) { // up cast failed
-        }
-      }
-      // else dynamic up cast failed
-      return result;
-    }
 
     //-----------------------------------------------------------------------------------------------------
 

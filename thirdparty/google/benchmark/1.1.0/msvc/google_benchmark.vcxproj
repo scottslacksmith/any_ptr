@@ -22,7 +22,6 @@
     <ProjectGuid>{F548DBF0-7452-476F-BAB8-ECA84FF9D12D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>googlebenchmark</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>google_benchmark</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

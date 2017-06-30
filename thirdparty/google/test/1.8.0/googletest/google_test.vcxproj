@@ -62,7 +62,6 @@
     <ProjectGuid>{55DF8739-4615-45C6-A976-9627CBC2745D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>google_test</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>google_test</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

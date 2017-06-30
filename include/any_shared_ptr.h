@@ -249,7 +249,6 @@ namespace xxx {
       1. sizeof(v2::any_shared_ptr) < sizeof(v1::any_shared_ptr) by 1 pointer
       2. the MSVC performance of casting to same type is marginally better
          due to avoiding a share_ptr copy.    
-
     */
     class any_shared_ptr
     {
@@ -319,8 +318,8 @@ namespace xxx {
       // otherwise typeid(void).
       const std::type_info & type() const noexcept { return holder()->type(); }
 
-      // Return true if the held shared_ptr use_count is 1 (mimics std::shared_ptr::unique())
-      bool  unique() const noexcept { return holder()->unique(); }
+      // returns the number of shared_ptr objects referring to the same managed object 
+      long  use_count() const noexcept { return holder()->use_count(); }
 
     private:
 
@@ -360,7 +359,7 @@ namespace xxx {
 
         virtual bool                    has_value() const noexcept = 0;
         virtual const std::type_info&   type() const noexcept = 0;
-        virtual bool                    unique() const noexcept = 0;
+        virtual long                    use_count() const noexcept = 0;
         virtual const IHolder *         clone(void* const inplaceMemory) const noexcept = 0;
         virtual void                    throw_held_pointer() const = 0;
         virtual std::shared_ptr<void>   make_shared_ptr_alias(void * ptr) const noexcept = 0;
@@ -377,7 +376,7 @@ namespace xxx {
 
         bool                    has_value() const noexcept { return true; }
         const std::type_info&   type() const noexcept { return typeid(HeldType<T>); }
-        bool                    unique() const noexcept final { return my_ptr.unique(); }
+        long                    use_count() const noexcept final { return my_ptr.use_count(); }
         const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) Holder(my_ptr); }
         void                    throw_held_pointer() const final { throw my_ptr.get(); }
         std::shared_ptr<void>   make_shared_ptr_alias(void* p) const noexcept final { return std::shared_ptr<void>(my_ptr, p); }
@@ -392,7 +391,7 @@ namespace xxx {
 
         bool                    has_value() const noexcept { return false; }
         const std::type_info&   type() const noexcept { return typeid(void); }
-        bool                    unique() const noexcept final { return false; }
+        long                    use_count() const noexcept final { return false; }
         const IHolder *         clone(void* const inplaceMemory) const noexcept final { return ::new (inplaceMemory) EmptyHolder(); }
         void                    throw_held_pointer() const final {}
         std::shared_ptr<void>   make_shared_ptr_alias(void* ) const noexcept final { return my_ptr; }
