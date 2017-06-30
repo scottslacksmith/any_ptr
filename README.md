@@ -47,11 +47,11 @@ shared_ptr<const Derived> const_derived = any_shared_ptr_cast< const Derived >( 
 // OK - up-cast is supported
 shared_ptr<Base> base = any_shared_ptr_cast< Base >( any );  
 ```
-Many causal users of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion or up-cast behaviour. This is not a ```std::any``` defect. Its primary purpose is to store *objects* and not *references* to an object. In contrast ```any_shared_ptr``` is designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a [catch](#what's-the-catch) if performance is critical.
+A causal user of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion (e.g. ```shared_ptr<Derived> -> shared_ptr<const Derived>```) or pointer up-cast behaviour (```shared_ptr<Dervied> -> shared_ptr<Base>```). This is not a ```std::any``` defect. Its primary purpose is to store *objects* and not *references* to an object. In contrast ```any_shared_ptr``` is designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a [catch](#what's-the-catch) if performance is critical.
 ## ```any_shared_ptr``` interface
 ```any_shared_ptr```'s interface tries to be as consistent as possible with ```std::any_ptr```. The notable exceptions are;
-1. The noexcept version of ```any_shared_ptr_cast``` returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for ```std::any_ptr_cast```. The reason is due to temporary ```shared_ptr<T>``` returned by ```any_shared_ptr_cast``` that's necessary to handle an up-cast and thus it's not possible to return an address to a non-temporary object.
-2. ```any_shared_ptr```'s interface  includes the following std::shared_ptr observer member functions -  *unique* 
+1. The noexcept version of ```any_shared_ptr_cast``` returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for ```std::any_ptr_cast```. The reason is due to temporary ```shared_ptr<T>``` returned by ```any_shared_ptr_cast``` that's necessary to handle an up-cast which may return a different pointer address where there's multiple inheritance.
+2. ```any_shared_ptr```'s interface includes the following std::shared_ptr observer member functions -  *use_count* 
 ### Member functions
 
 #### Constructors
