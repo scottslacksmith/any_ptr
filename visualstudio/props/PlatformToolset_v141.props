@@ -8,6 +8,7 @@
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <PreprocessorDefinitions>_STL_EXTRA_DISABLED_WARNINGS=4061 4365 4582 4583 4623 4625 4626 4774 4987 5026 5027;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>

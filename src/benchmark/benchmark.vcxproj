@@ -23,7 +23,6 @@
     <ProjectGuid>{83B81187-5917-4AD6-A019-530CFA23707E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>benchmark</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(SolutionDir)props\PlatformToolset.props" />
