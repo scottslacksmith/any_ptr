@@ -84,7 +84,7 @@ namespace {
   bool BadAnyCast()
   {
     try {
-      std::any_cast<int>(any);
+      (void)std::any_cast<int>(any);
       return true;
     }
     catch (...) {
@@ -125,7 +125,7 @@ namespace {
 
   bool any_cast_with_shared_ptr()
   {
-    std::any_cast<std::shared_ptr<int>>(our_any_with_shared_ptr);
+    (void)std::any_cast<std::shared_ptr<int>>(our_any_with_shared_ptr);
     return true;
   }
 
