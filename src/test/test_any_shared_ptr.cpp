@@ -193,7 +193,7 @@ TEST(any_shared_ptr, void_nullptr)
   ASSERT_EQ(any.type(), typeid(shared_ptr<void>));
   // Test casting to the held type
   shared_ptr<void> p1 = any_shared_ptr_cast<void>(any);
-  ASSERT_EQ(p1, nullptr);
+  ASSERT_TRUE(p1 == nullptr);
   EXPECT_THROW(any_shared_ptr_cast<int>(any), bad_any_shared_ptr_cast);
 }
 
