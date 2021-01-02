@@ -50,7 +50,7 @@ shared_ptr<Base> base = any_shared_ptr_cast< Base >( any );
 An occasional user of ```std::any``` may be surprised to find that ```std::any``` doesn't preserve pointer cv-qualifier promotion (e.g. ```shared_ptr<Derived> -> shared_ptr<const Derived>```) or pointer up-cast behaviour (```shared_ptr<Dervied> -> shared_ptr<Base>```). This is simply a limitation of ```std::any```. Its primary purpose is to store *objects* and not *references*. In contrast ```any_shared_ptr``` is designed to store *references* to an object and thus preserves normal pointer behaviour. However there's a [catch](#what's-the-catch) if performance is critical.
 ## ```any_shared_ptr``` interface
 ```any_shared_ptr```'s interface tries to be as consistent as possible with ```std::any_ptr```. The notable exceptions are;
-1. The noexcept version of ```any_shared_ptr_cast``` returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for ```std::any_ptr_cast```. The reason is due to temporary ```shared_ptr<T>``` returned by ```any_shared_ptr_cast``` that's necessary to handle an up-cast which may return a different pointer address where there's multiple inheritance.
+1. The noexcept version of ```any_shared_ptr_cast``` returns ```std::optional<std::shared_ptr<T>>``` and not ```std::shared_ptr<T>*``` as is the case for ```std::any_ptr_cast```. The reason is due to the temporary ```shared_ptr<T>``` returned by ```any_shared_ptr_cast``` that's necessary to handle a different pointer address that can occurr when up-casting due to multiple inheritance.
 2. ```any_shared_ptr```'s interface includes the following std::shared_ptr observer member functions -  *use_count* 
 ### Member functions
 
@@ -186,7 +186,7 @@ cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true -DCMAKE_CXX_COMPILE
 
 ## Compiler Support
 
-```any_shared_ptr``` is implemented using ```shared_ptr```'s aliasing contructor that was added to the C++11 standard and thus was not in the TR1 version of ```shared_ptr``` (see Anthony Williams execellent blog [std::shared_ptr's secret constructor](https://www.justsoftwaresolutions.co.uk/cplusplus/shared-ptr-secret-constructor.html) for further details). In addition Google's ***benchmark*** and ***test*** libraries require a modern C++ toolchain, both compiler and standard library.
+```any_shared_ptr``` is implemented using ```shared_ptr```'s aliasing constructor that was added to the C++11 standard and thus was not in the TR1 version of ```shared_ptr``` (see Anthony Williams execellent blog [std::shared_ptr's secret constructor](https://www.justsoftwaresolutions.co.uk/cplusplus/shared-ptr-secret-constructor.html) for further details). In addition Google's ***benchmark*** and ***test*** libraries require a modern C++ toolchain, both compiler and standard library.
 
 The following minimum versions are strongly recommended to build the library:  
 * GCC 5  
