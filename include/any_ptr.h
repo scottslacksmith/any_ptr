@@ -112,6 +112,13 @@ namespace xxx {
         // Use default ctor to reset to empty state
         ::new (this) any_ptr();
       }
+      
+      // reset to immitate other object
+      void immitate(any_ptr& other) noexcept
+      {
+        // immitate a specific any_ptr via specific ctor
+        ::new (this) any_ptr(other);
+      }
 
       // Swaps two any objects
       void swap(any_ptr & other) noexcept
