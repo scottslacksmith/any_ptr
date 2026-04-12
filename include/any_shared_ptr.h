@@ -400,7 +400,8 @@ namespace xxx {
       static_assert(sizeof(Holder<void>) == sizeof(EmptyHolder), "It's not essential but sizeof(Holder<void>) == sizeof(EmptyHolder)"
                                                                  " is better so that all bytes in my_inplace_storage are initialized");
 
-      using storage_t = typename std::aligned_storage<sizeof(Holder<void>), std::alignment_of<Holder<void>>::value>::type;
+      struct alignas(Holder<void>) storage_t { unsigned char data[sizeof(Holder<void>)]; };
+
 
       // Inplace storage to hold Holder<T>
       storage_t               my_inplace_storage;
